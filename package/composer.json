@@ -1,0 +1,23 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+    "name": "vendor/recordskeeper-php-sdk",
+    "type": "library",
+    "description": "library for PHP package recordskeeper-php-sdk.",
+    "homepage": "https://github.com/php-pds/recordskeeper-php-sdk",
+    "license": "CC-BY-SA-4.0",
+    "autoload": {
+        "classmap": [
+                 "recordskeeper-php-sdk//", "source/"
+
+             ]
+          },
+    "autoload-dev": {
+        "classmap": {
+            "recordskeeper-php-sdk//": "tests/"
+        }
+    },
+    "bin": ["bin/vendor-recordskeeper-php-sdk"],
+	"require-dev": {
+		"phpunit/phpunit": "^7"
+	}
+}
