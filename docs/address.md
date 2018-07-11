@@ -107,7 +107,7 @@ retrieveAddresses() function is used to list all addresses and no of addresses o
   $result = $newaddress->retrieveAddresses();                 #retrieveAddresses function call
   echo($result->address);                                     #print all the addresses of the wallet
   echo($result->address_count);                               #print the address count
-'''
+```
 It will return all the addresses and the count of the addresses on the wallet.
  
 **5.Check validity of the address**
