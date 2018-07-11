@@ -77,36 +77,36 @@ curl_setopt_array($curl, array(
         "content-type: application/json"
     )
 ));
-error_log("Sending request: listassets");
-$result   = json_decode(curl_exec($curl));
-$err      = curl_error($curl);
-$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-if ($httpCode == 200 && $result->error == null) {
+    error_log("Sending request: listassets");
+    $result   = json_decode(curl_exec($curl));
+    $err      = curl_error($curl);
+    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    if ($httpCode == 200 && $result->error == null) {
 
-	$assetcount = count($result->result);
-	//echo $assetcount;
+    	$assetcount = count($result->result);
+    	//echo $assetcount;
 
-	
-	// $array = count(19);
-     $asset_names=[];
-     $issue_ids=[];
-     $issue_qtys=[];
-     for($i=0;$i<$assetcount;$i++){
-     	$asset_name = $result->result[$i]->name;
-	    $issue_id = $result->result[$i]->issuetxid;
-        $issue_qty = $result->result[$i]->issueraw;
-         array_push($asset_names,$asset_name);
-         array_push($issue_ids,$issue_id);
-         array_push($issue_qtys,$issue_qty);
-     }
-    $myJSON = array("asset_count" => $assetcount,"asset_name"=> $asset_names ,"issue_id" => $issue_ids,"issue_qty" =>$issue_qtys);
-    $jsonstring = json_encode($myJSON, JSON_PRETTY_PRINT);
-     
-} else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
-    error_log("ERROR: Info not fetched from blockchain");
-}
-return $jsonstring;
-}
+    	
+    	// $array = count(19);
+         $asset_names=[];
+         $issue_ids=[];
+         $issue_qtys=[];
+         for($i=0;$i<$assetcount;$i++){
+         	$asset_name = $result->result[$i]->name;
+    	    $issue_id = $result->result[$i]->issuetxid;
+            $issue_qty = $result->result[$i]->issueraw;
+             array_push($asset_names,$asset_name);
+             array_push($issue_ids,$issue_id);
+             array_push($issue_qtys,$issue_qty);
+         }
+        $myJSON = array("asset_count" => $assetcount,"asset_name"=> $asset_names ,"issue_id" => $issue_ids,"issue_qty" =>$issue_qtys);
+        $jsonstring = json_encode($myJSON, JSON_PRETTY_PRINT);
+         
+    } else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
+        error_log("ERROR: Info not fetched from blockchain");
+    }
+    return $jsonstring;
+    }
 
 
 function Sendassets($Toaddress,$assetname,$qty) {
@@ -128,19 +128,19 @@ curl_setopt_array($curl, array(
         "content-type: application/json"
     )
 ));
-error_log("Sending request: listassets");
-$result   = json_decode(curl_exec($curl));
-$err      = curl_error($curl);
-$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-if ($httpCode == 200 && $result->error == null) {
+    error_log("Sending request: listassets");
+    $result   = json_decode(curl_exec($curl));
+    $err      = curl_error($curl);
+    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    if ($httpCode == 200 && $result->error == null) {
 
-    
-  
-} else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
-    error_log("ERROR: Info not fetched from blockchain");
-}
-return $result;
-}
+        
+      
+    } else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
+        error_log("ERROR: Info not fetched from blockchain");
+    }
+    return $result;
+    }
 
 
 }

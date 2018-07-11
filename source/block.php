@@ -30,35 +30,35 @@ curl_setopt_array($curl, array(
         "content-type: application/json"
     )
 ));
-error_log("Sending request: getblock");
-$result   = json_decode(curl_exec($curl));
-$err      = curl_error($curl);
-$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-if ($httpCode == 200 && $result->error == null) {    
-    $block =count($result->result->tx);
-   
-    $miner =$result->result->miner;
-    $size =$result->result->size;
-    $nonce =$result->result->nonce;
-    $blockhash =$result->result->hash;
-    $prevblock =$result->result->previousblockhash;
-    $nextblock =$result->result->nextblockhash;
-    $merkleroot=$result->result->merkleroot;
-    $blocktime =$result->result->time;
-    $difficulty=$result->result->difficulty;
-
-     $tx=[];
-     for($i=0;$i<$block;$i++){
-        array_push($tx, $result->result->tx[$i]);
-     }
-    $myJSON = array("tx[0]" => $block,"tx"=> $tx ,"miner" => $miner,"size" =>$size,"nonce" =>$nonce,"hash" =>$blockhash,"previousblockhash" =>$prevblock,"nextblockhash" =>$nextblock,"merkleroot" =>$merkleroot,"time" =>$blocktime,"difficulty" =>$difficulty);
-    $jsonstring = json_encode($myJSON, JSON_PRETTY_PRINT);
+  error_log("Sending request: getblock");
+  $result   = json_decode(curl_exec($curl));
+  $err      = curl_error($curl);
+  $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+  if ($httpCode == 200 && $result->error == null) {    
+      $block =count($result->result->tx);
      
-} else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
-    error_log("ERROR: Info not fetched from blockchain");
-}
- return $jsonstring;
-}
+      $miner =$result->result->miner;
+      $size =$result->result->size;
+      $nonce =$result->result->nonce;
+      $blockhash =$result->result->hash;
+      $prevblock =$result->result->previousblockhash;
+      $nextblock =$result->result->nextblockhash;
+      $merkleroot=$result->result->merkleroot;
+      $blocktime =$result->result->time;
+      $difficulty=$result->result->difficulty;
+
+       $tx=[];
+       for($i=0;$i<$block;$i++){
+          array_push($tx, $result->result->tx[$i]);
+       }
+      $myJSON = array("tx[0]" => $block,"tx"=> $tx ,"miner" => $miner,"size" =>$size,"nonce" =>$nonce,"hash" =>$blockhash,"previousblockhash" =>$prevblock,"nextblockhash" =>$nextblock,"merkleroot" =>$merkleroot,"time" =>$blocktime,"difficulty" =>$difficulty);
+      $jsonstring = json_encode($myJSON, JSON_PRETTY_PRINT);
+       
+  } else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
+      error_log("ERROR: Info not fetched from blockchain");
+  }
+   return $jsonstring;
+  }
 
 function retreiveblocks($block_range){
 $curl = curl_init();
@@ -79,44 +79,44 @@ curl_setopt_array($curl, array(
         "content-type: application/json"
     )
 ));
-error_log("Sending request: listblocks");
-$result   = json_decode(curl_exec($curl));
-$err      = curl_error($curl);
-$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-if ($httpCode == 200 && $result->error == null) {
-         
-    $block =count($result->result);
+  error_log("Sending request: listblocks");
+  $result   = json_decode(curl_exec($curl));
+  $err      = curl_error($curl);
+  $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+  if ($httpCode == 200 && $result->error == null) {
+           
+      $block =count($result->result);
 
-     $allresult1=[];
-     $hash= [];
-     $miner=[];
-     $blocktime=[];
-     $tx_count=[];
+       $allresult1=[];
+       $hash= [];
+       $miner=[];
+       $blocktime=[];
+       $tx_count=[];
 
-      for($i=0;$i<$block;$i++){
-        $hash1= $result->result[$i]->hash;
-        
-        $miner1=$result->result[$i]->miner;
-        
-        $blocktime1=$result->result[$i]->time;
-        
-        $tx_count1=$result->result[$i]->txcount;
+        for($i=0;$i<$block;$i++){
+          $hash1= $result->result[$i]->hash;
+          
+          $miner1=$result->result[$i]->miner;
+          
+          $blocktime1=$result->result[$i]->time;
+          
+          $tx_count1=$result->result[$i]->txcount;
 
-         array_push($hash, $hash1);
-      array_push($miner, $miner1);
-       array_push($blocktime, $blocktime1);
-        array_push($tx_count, $tx_count1);
-        
+           array_push($hash, $hash1);
+        array_push($miner, $miner1);
+         array_push($blocktime, $blocktime1);
+          array_push($tx_count, $tx_count1);
+          
 
-     }
-     $myJSON = array("miner" => $miner,"hash"=> $hash ,"time" =>$blocktime,"txcount" =>$tx_count);
-     $jsonstring = json_encode($myJSON, JSON_PRETTY_PRINT);
-    
-    
+       }
+       $myJSON = array("miner" => $miner,"hash"=> $hash ,"time" =>$blocktime,"txcount" =>$tx_count);
+       $jsonstring = json_encode($myJSON, JSON_PRETTY_PRINT);
+      
+      
 
-  return $jsonstring;
+    return $jsonstring;
 
-}
+  }
 }
 }
 

@@ -39,14 +39,14 @@ class Transaction
         "content-type: application/json"
     )
 ));
-error_log("Sending request: createrawsendfrom");
-$result   = json_decode(curl_exec($curl));
+    error_log("Sending request: createrawsendfrom");
+    $result   = json_decode(curl_exec($curl));
 
-$err      = curl_error($curl);
-$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-$txid = $result->result;
-return $txid;
-}
+    $err      = curl_error($curl);
+    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    $txid = $result->result;
+    return $txid;
+    }
 
 function createrawtransaction($sender_address,$receiver_address,$data,$amount) {
         $hex_data = bin2hex($data);
@@ -70,16 +70,16 @@ curl_setopt_array($curl, array(
         "content-type: application/json"
     )
 ));
-error_log("Sending request: createrawsendfrom");
-$result   = json_decode(curl_exec($curl));
+    error_log("Sending request: createrawsendfrom");
+    $result   = json_decode(curl_exec($curl));
 
-$err      = curl_error($curl);
-$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    $err      = curl_error($curl);
+    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
-    $createraw = $result->result;
+        $createraw = $result->result;
 
-return $createraw;
-}
+    return $createraw;
+    }
 
 function signrawtransaction($tx_hex,$private_key) {
 
@@ -101,22 +101,22 @@ curl_setopt_array($curl, array(
         "content-type: application/json"
     )
 ));
-error_log("Sending request: signrawtransaction");
-$result   = json_decode(curl_exec($curl));
+    error_log("Sending request: signrawtransaction");
+    $result   = json_decode(curl_exec($curl));
 
-$err      = curl_error($curl);
-$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    $err      = curl_error($curl);
+    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
-     $res=$result->result->complete;
+         $res=$result->result->complete;
 
-    if($res == false){
-        $status = "Transaction has not signed";
-    } else {
-        $status = $result->result->hex;
+        if($res == false){
+            $status = "Transaction has not signed";
+        } else {
+            $status = $result->result->hex;
+        }
+
+    return $status;
     }
-
-return $status;
-}
 
 
 function sendrawtransaction($signed_txhex) {
@@ -139,36 +139,32 @@ curl_setopt_array($curl, array(
         "content-type: application/json"
     )
 ));
-error_log("Sending request: sendrawtransaction");
-$result   = json_decode(curl_exec($curl));
+    error_log("Sending request: sendrawtransaction");
+    $result   = json_decode(curl_exec($curl));
 
-$err      = curl_error($curl);
-$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    $err      = curl_error($curl);
+    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
-     $txid= $result->result;
+         $txid= $result->result;
 
-      if($txid == null){
-          $print =  $result->error->message;
-      }
-      else {
-        $print = $txid;
+          if($txid == null){
+              $print =  $result->error->message;
+          }
+          else {
+            $print = $txid;
+        }
+
+    return $print;
     }
-
-return $print;
-}
 
 function sendsignedtransaction($sender_address,$reciever_address,$private_key,$data,$amount) {
         $hex_data = bin2hex($data);
         
-        
-        
         $dumptxHex = $this->createrawtransaction($sender_address,$reciever_address,$hex_data,$amount);
-        
         
         $signedtxHex = $this->signrawtransaction($dumptxHex,$private_key);
         
-        
-    $txid = $this->sendrawtransaction($signedtxHex);
+        $txid = $this->sendrawtransaction($signedtxHex);
     
     return $txid;
 }
@@ -193,22 +189,22 @@ function retrievetransaction($txid){
         "content-type: application/json"
     )
 ));
-error_log("Sending request: getrawtransaction");
-$result   = json_decode(curl_exec($curl));
+    error_log("Sending request: getrawtransaction");
+    $result   = json_decode(curl_exec($curl));
 
-$err      = curl_error($curl);
-$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-    $retrievehexdata = $result->result->data[0];
-    $sentdata  =hex2bin("$retrievehexdata");
-    $sentamount =  $result->result->vout[0]->value;
+    $err      = curl_error($curl);
+    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        $retrievehexdata = $result->result->data[0];
+        $sentdata  =hex2bin("$retrievehexdata");
+        $sentamount =  $result->result->vout[0]->value;
 
-     $myJSON = array("data" => $retrievehexdata,"value" => $sentamount);
-    $json_string = json_encode($myJSON, JSON_PRETTY_PRINT);
-    
-return $json_string;
+         $myJSON = array("data" => $retrievehexdata,"value" => $sentamount);
+        $json_string = json_encode($myJSON, JSON_PRETTY_PRINT);
+        
+    return $json_string;
 
 
-}
+    }
 
 function getfee($txid,$address){
       $curl = curl_init();
@@ -230,19 +226,19 @@ function getfee($txid,$address){
         "content-type: application/json"
     )
 ));
-error_log("Sending request: getaddresstransaction");
-$result   = json_decode(curl_exec($curl));
+    error_log("Sending request: getaddresstransaction");
+    $result   = json_decode(curl_exec($curl));
 
-$err      = curl_error($curl);
-$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    $err      = curl_error($curl);
+    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
-    $sentamount = $result->result->vout[0]->amount;
-    $balanceamount =  $result->result->balance->amount;
-    $fees = (abs($balanceamount) - $sentamount);
+        $sentamount = $result->result->vout[0]->amount;
+        $balanceamount =  $result->result->balance->amount;
+        $fees = (abs($balanceamount) - $sentamount);
+            
         
-    
 
-return $fees;
+    return $fees;
 
 
 }

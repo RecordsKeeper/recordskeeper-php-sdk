@@ -31,25 +31,25 @@ curl_setopt_array($curl, array(
         "content-type: application/json"
     )
 ));
-error_log("Sending request: grant");
-$result   = json_decode(curl_exec($curl));
-$err      = curl_error($curl);
-$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-if ($httpCode == 200 && $result->error == null) {
-    
-    if($result == null){
-        $print = $result->error->message;
-    } else {
-        $print = $result->result;
+    error_log("Sending request: grant");
+    $result   = json_decode(curl_exec($curl));
+    $err      = curl_error($curl);
+    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    if ($httpCode == 200 && $result->error == null) {
+        
+        if($result == null){
+            $print = $result->error->message;
+        } else {
+            $print = $result->result;
+        }
+        
+
+    } else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
+        error_log("ERROR: Info not fetched from blockchain");
     }
-    
 
-} else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
-    error_log("ERROR: Info not fetched from blockchain");
-}
-
-return $print;
-}
+    return $print;
+    }
 
 function revokepermissions($address,$permissions){
 $curl = curl_init();
@@ -70,25 +70,25 @@ curl_setopt_array($curl, array(
         "content-type: application/json"
     )
 ));
-error_log("Sending request: revoke");
-$result   = json_decode(curl_exec($curl));
-$err      = curl_error($curl);
-$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-if ($httpCode == 200 && $result->error == null) {
-         
-     if($result == null){
-        $print = $result->error->message;
-    } else {
-        $print = $result->result;
+    error_log("Sending request: revoke");
+    $result   = json_decode(curl_exec($curl));
+    $err      = curl_error($curl);
+    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    if ($httpCode == 200 && $result->error == null) {
+             
+         if($result == null){
+            $print = $result->error->message;
+        } else {
+            $print = $result->result;
+        }
+        
+
+    } else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
+        error_log("ERROR: Info not fetched from blockchain");
     }
-    
 
-} else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
-    error_log("ERROR: Info not fetched from blockchain");
-}
-
-return $print;
-}
+    return $print;
+    }
 
 }
 

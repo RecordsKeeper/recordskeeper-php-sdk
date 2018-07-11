@@ -1,0 +1,179 @@
+<h1 id="streamclassusage">Stream Class Usage</h1>
+
+<p>Library to work with RecordsKeeper streams.</p>
+
+<p>You can publish, retrieve and verify stream data by using Stream class. You just have to pass parameters to invoke the pre-defined functions of Stream class.</p>
+
+<h2 id="nodeauthentication">Node Authentication</h2>
+
+<p>Import config file.</p>
+
+<pre><code class="PHP language-PHP">$config = include('config.php')
+</code></pre>
+
+<p>Import values from config file.</p>
+
+<ul>
+<li>User name: The rpc user is    used to call the APIs.</li>
+
+<li>Password: The rpc password is used to authenticate the APIs.</li>
+</ul>
+
+<pre><code class="PHP language-PHP">   $chain = $config['chain'];
+   $url = $config['url'];
+   $username = $config['rkuser'];
+   $pass = $config['passwd'];
+   $port = $config['port'];
+</code></pre>
+
+<p>Now we have node authentication credentials.</p>
+
+<h2 id="streamclass">Stream Class</h2>
+
+<p>class Stream</p>
+
+<p>Stream class to call stream related functions like publish, retrievewithtxid, retrieveWithAddress, retrieveWithKey and verify data functions which are used to publish data into the stream, retrieve data from the stream and verify data from the stream. </p>
+
+<p><strong>1.  Publish</strong></p>
+
+<p>You have to pass these four arguments to the publish function call:</p>
+
+<ul>
+<li>Data Hex of the data to be published</li>
+
+<li>Address of the publihser</li>
+
+<li>Stream to which you want your data to be published</li>
+
+<li>key Value for the data to be published</li>
+</ul>
+
+<p>The <strong>data.hex()</strong> will convert the data into a hex value</p>
+
+<pre><code class="PHP language-PHP"> publish($address,$stream,$key,$data)   
+
+
+  $pub = new stream();
+  $result = $pub-&gt;publish($address,$stream,$key,$data);                    #publish() function call
+  echo($result);                                              # #prints the transaction id of the data published
+
+It will return the transaction id of the published data, use this information to retrieve the particular data from the stream.
+</code></pre>
+
+<p><strong>2.  Retrieve an existing item from a particular stream against a transaction id</strong></p>
+
+<p>You have to pass these two arguments to the retrieve function call:</p>
+
+<ul>
+<li>Stream name: which you want to access</li>
+
+<li>Transaction id: id of the data you want to retrieve</li>
+</ul>
+
+<pre><code class="PHP  language-PHP ">  retrieve($stream,$txid) 
+
+  $ret = new stream();    
+  $result = $ret-&gt;retrieve($stream,$txid);     #call retrieve function with stream and txid as the required parameter
+
+  echo($result);     #prints info of the transaction                                            
+
+ It will return the item's details like publisher address, key value, confirmations, hexdata and transaction id.
+</code></pre>
+
+<p><strong>3.Retrieve an item against a particular publisher address</strong></p>
+
+<p>You have to pass these three arguments to the retrieveWithAddress function call:</p>
+
+<ul>
+<li>Stream name: which you want to access</li>
+
+<li>Publisher address: address of the data publisher you want to verify</li>
+
+<li>Count: no of items you want to retrieve</li>
+</ul>
+
+<pre><code class="PHP language-PHP">  retrieveWithAddress($stream,$address,$count)
+
+      $ret = new stream();
+      $result = $ret-&gt;retrieveWithAddress($stream,$address,$count);   #retrieveWithAddress() function call
+      echo($result-&gt;key);                                               #prints key value of the data
+  echo($result-&gt;txid);    #prints transaction id of the data
+  echo($result-&gt;data);         #prints raw data 
+ It will return the key value, raw data and transaction id of the published item.
+</code></pre>
+
+<p><strong>4. Retrieve an item against a particular key value</strong></p>
+
+<p>You have to pass these three arguments to the retrieveWithKey function call:</p>
+
+<ul>
+<li>Stream name: which you want to access</li>
+
+<li>Key: key value of the published data you want to verify</li>
+
+<li>Count: no of items you want to retrieve</li>
+</ul>
+
+<pre><code class="PHP  language-PHP ">  retrieveWithKey($stream,$key,$count)
+
+      $ret = new stream();    
+      $result = $ret-&gt;retrieveWithKey($stream,$key,$count);     #call retrieveWithKey function with stream,key and count as the required parameter
+
+  echo($result-&gt;publisher);     #prints publisher's address of the published data
+  echo($result-&gt;txid);       #prints transaction id of the data
+  echo($result-&gt;data);     #prints raw data 
+
+
+  it will return the key value, raw data and transaction id of the published item.
+</code></pre>
+
+<p><strong>5. Verify an data item on a particular stream of RecordsKeeper Blockchain</strong></p>
+
+<p>You have to pass these three arguments to the retrieveWithKey function call:</p>
+
+<ul>
+<li>Stream name: which you want to access</li>
+
+<li>Data: against which you want to make a query</li>
+
+<li>Count: count of items which will be queried</li>
+</ul>
+
+<pre><code class="PHP  language-PHP "> verifyData($stream,$data,$count)
+
+      $verify = new stream();    
+      $result = $verify-&gt;verifyData($stream,$data,$count);
+   #call verifyData function with stream,data and count as the required parameter
+
+  echo($result);     #prints if verification is successful or not
+
+It will return the result if verification is successful or not.
+</code></pre>
+
+<p><strong>6. Retrieve data items on a particular stream of RecordsKeeper Blockchain</strong></p>
+
+<p>You have to pass these two arguments to the verifyWithKey function call:</p>
+
+<ul>
+<li>Stream name: which you want to access</li>
+
+<li>Count: count of items which will be queried</li>
+</ul>
+
+<pre><code class="PHP  language-PHP ">   retrieveItems($stream,$count)
+
+      $retitems = new stream();    
+      $result = $retitems-&gt;retrieveItems($stream,$count);
+   #call retrieveItems function with stream and count as the required parameter
+
+  echo($result-&gt;address);     #prints address of the publisher of the item
+   echo($result-&gt;key);    #prints key value of the stream item
+   echo($result-&gt;data);     #prints raw data published
+    echo($result-&gt;txid);      #prints transaction id of the item published 
+
+
+    It will return the address, key value, data and transaction id of the stream item published.
+  ```  
+
+It will return the result if verification is successful or not.
+</code></pre>
