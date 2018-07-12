@@ -75,8 +75,8 @@ You have to pass these three arguments to the createAsset function call:
 ```PHP
   retrieveBlocks($block_range) 
 
-  $ret = new assets();
-  $result = $ret->retrieveBlocks($block_range);           #sendAsset() function call
+  $ret = new block();
+  $result = $ret->retrieveBlocks($block_range);           #retrieveBlocks() function call
   echo($result->blockhash);                               #print hash of the blocks
   echo($result->miner);                                   #prints miner of the blocks
   echo($result->blocktime);                               #prints block time of the blocks

@@ -35,7 +35,7 @@ Now we have node authentication credentials.
 Permissions Class
 -----------------
 
-   class Permissions
+  class Permissions
 
     
   Permissions class is used to call permissions related functions like grant and revoke permissions for an address functions which are used on the RecordsKeeeper Blockchain. 
@@ -81,22 +81,4 @@ revokePermission() function is used to revoke permissions like connect, send, re
   echo($result);                                                   #prints response of the revoke permision transaction
 ```  
 It will return the transaction id of the permission transaction.
-
-
-**3.List all assets on the RecordsKeeper Blockchain**
-
-retrieveAssets() function is used to list all assets, no of assets, issued quantity and issued transaction id of all the assets on RecordsKeeper Blockchain.
-
-
-```PHP
-  retrieveAssets()  
-
-  $ret = new assets();
-  $result = $ret->retrieveAssets();                               #retrieveAssets() function call
-  echo($result->name);                                            #print  name of all the assets
-  echo($result->asset_count);                                     #prints total asset count
-  echo($result->id);                                              #prints assets issued transaction id
-  echo($result->qty);                                             #prints assets issued quantity
-```
-It will return all the assets, the count of the assets, issued quantity of assets and issued transaction id of the asset on the RecordsKeeper Blockchain.
 

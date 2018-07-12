@@ -143,7 +143,7 @@ dumpWallet() function is used to retrieve transaction's information by passing t
 
   $Dwallet = new wallet();
   $result = $Dwallet->dumpWallet($filename);                #dumpWallet() function call
-  echo($result);                                           #print result 
+  echo($result);                                            #print result 
 ```  
 It will return the response of the dump wallet function. Dumps the entire set of private keys in the wallet into a human-readable text format in file filename. Use with caution – any node with access to this file can perform any action restricted to this node’s addresses.
 
@@ -235,10 +235,10 @@ verifyMessage() function is used to change wallet's password and set new passwor
 
 
 ```PHP
-   verifyMessage($address,$signedMessage, $message)
+   verifyMessage($address,$signedMessage,$message)
       
    $verify = new wallet();
-   $result = $verify->verifyMessage($address,$signedMessage, $message);    #verifyMessage() function call
+   $result = $verify->verifyMessage($address,$signedMessage,$message);    #verifyMessage() function call
    echo($result);                                                         #print validity of the message
 ```
 It will return the validity of the message.

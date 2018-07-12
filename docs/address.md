@@ -124,7 +124,7 @@ checkifValid() function is used to check validity of a particular address.
   $newaddress = new address();
   $result = $newaddress->checkifValid();                     #checkifValid() function call
   echo($result);                                             #print validity of the address
-```
+```  
 It will return if an address is valid or not.
 
 **6.Check if given address has mining permission or not**

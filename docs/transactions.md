@@ -97,10 +97,10 @@ createRawTransaction() function is used to create raw transaction by passing rec
 
 
 ```PHP
-   createRawTransaction(sender_address, reciever_address, amount, data)  
+   createRawTransaction($sender_address,$reciever_address,$amount,$data)  
 
    $tx_hex = new Transaction();
-   $result = $tx_hex->createRawTransaction(sender_address, reciever_address, amount, data);   #createRawTransaction() function call
+   $result = $tx_hex->createRawTransaction($sender_address,$reciever_address,$amount,$data);   #createRawTransaction() function call
    echo($result);                                               #prints transaction hex of the raw transaction.
 ``` 
 It will return transaction hex of the raw transaction.
@@ -136,10 +136,10 @@ sendRawTransaction() function is used to send raw transaction by passing signed 
 
 
 ```PHP 
-  sendRawTransaction(signed_txHex) 
+  sendRawTransaction($signed_txHex) 
 
   $sendraw = new Transaction();    
-  $result = $sendraw-> sendRawTransaction(signed_txHex);      #sendRawTransaction() function call
+  $result = $sendraw-> sendRawTransaction($signed_txHex);      #sendRawTransaction() function call
   
   echo($result);                                              #prints transaction id of the raw transaction
 ```
@@ -187,6 +187,5 @@ getFee() function is used to calculate transaction's fee by passing transaction 
    echo($result);                                             #prints fees consumed in the verified transaction
 ```  
    
-
 It will return the fees consumed in the transaction.
  
