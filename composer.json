@@ -22,7 +22,8 @@
     
     "autoload-dev": {
         "psr-4": { "": "tests/"}
-         }
+         },
+    "version": "0.0.1"
    
 }
 
