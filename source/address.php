@@ -7,6 +7,8 @@
  $pass = $config['passwd'];
  $port = $config['port'];
 
+namespace recordskeeper/recordskeepersdk; 
+
 class address
 
  {  
