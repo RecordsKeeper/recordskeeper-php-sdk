@@ -4,8 +4,7 @@ use PHPUnit\Framework\TestCase;
 require '../source/blockchain.php';
 
 
-$config = include('test_config.php');
-
+ $config = include('../../../../config.php');
 $chain_name = $config['chain-name'];
 
 

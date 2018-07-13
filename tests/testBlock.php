@@ -3,7 +3,7 @@
 use PHPUnit\Framework\TestCase;
 require '../source/block.php';
 
-$config = include('test_config.php');
+ $config = include('../../../../config.php');
 //$validaddress1 =$config['validaddress1'];\
 $mainaddress=$config['mainaddress'];
 $merkleroot =$config['merkleroot'];

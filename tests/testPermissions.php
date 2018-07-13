@@ -3,7 +3,7 @@
 use PHPUnit\Framework\TestCase;
 require '../source/permissions.php';
 
-$config = include('test_config.php');
+ $config = include('../../../../config.php');
 $permissionaddress =$config['permissionaddress'];
 $wrongpermissionaddress=$config['wrongpermissionaddress'];
 

@@ -3,7 +3,7 @@
 use PHPUnit\Framework\TestCase;
 require '../source/assets.php';
 
-$config = include('test_config.php');
+ $config = include('../../../../config.php');
 $Kvaladdress =$config['Kvaladdress'];
 
 

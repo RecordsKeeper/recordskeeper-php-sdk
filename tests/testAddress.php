@@ -3,7 +3,7 @@
 use PHPUnit\Framework\TestCase;
 require '../source/address.php';
 
-$config = include('test_config.php');
+ $config = include('../../../../config.php');
 $validaddress = $config['validaddress'];
 $invalidaddress=$config['invalidaddress'];
 $miningaddress =$config['miningaddress'];

@@ -1,8 +1,7 @@
 <?php
 
 
-$config = include('config.php');
-
+ $config = include('../../../../config.php');
 
 
  $chain = $config['chain'];

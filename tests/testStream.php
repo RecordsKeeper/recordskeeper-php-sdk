@@ -3,7 +3,7 @@
 use PHPUnit\Framework\TestCase;
 require '../source/stream.php';
 
-$config = include('test_config.php');
+ $config = include('../../../../config.php');
 $miningaddress= $config['miningaddress'];
 $stream=$config['stream'];
 $txid =$config['txid'];

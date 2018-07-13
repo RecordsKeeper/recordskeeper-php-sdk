@@ -3,7 +3,7 @@
 use PHPUnit\Framework\TestCase;
 require '../source/wallet.php';
 
-$config = include('test_config.php');
+ $config = include('../../../../config.php');
 $newaddress =$config['newaddress'];
 $Kprivkey =$config['Kprivkey'];
 $testdata=$config['testdata'];

@@ -3,7 +3,7 @@
 use PHPUnit\Framework\TestCase;
 require '../source/transactions.php';
 
-$config = include('test_config.php');
+ $config = include('../../../../config.php');
 $validaddress =$config['validaddress'];
 $miningaddress =$config['miningaddress'];
 $dumpsignedtxhex =$config['dumpsignedtxhex'];

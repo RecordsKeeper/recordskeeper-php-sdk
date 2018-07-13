@@ -1,6 +1,6 @@
 <?php
 
- $config = include('config.php');
+ $config = include('../../../../config.php');
  $chain = $config['chain'];
  $url = $config['url'];
  $username = $config['rkuser'];
