@@ -1,5 +1,5 @@
 {
-    "name": "recordskeeper/recordskeeper-sdk",
+    "name": "recordskeeper/recordskeepersdk",
     "type": "library",
     "description": "library for PHP package recordskeeper-php-sdk.",
     "homepage": "https://github.com/RecordsKeeper/recordskeeper-php-sdk",
