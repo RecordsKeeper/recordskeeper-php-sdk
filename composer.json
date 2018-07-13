@@ -23,9 +23,9 @@
     "autoload-dev": {
         "psr-4": { "": "tests/"}
          },
-    "version": "0.0.2",
+    "version": "1.0.0",
     "minimum-stability": "dev",
-     "prefer-stable" : true
+    "prefer-stable" : true
    
 }
 
