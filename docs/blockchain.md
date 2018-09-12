@@ -15,7 +15,6 @@ Import config file.
 ```PHP
 $config = include('config.php');
 ```
-Import values from config file.
 
 Import RecordsKeeper library.
 
