@@ -1,60 +1,25 @@
 <?php
 
- $config = include('../../../../config.php');
+namespace recordskeeper\recordskeepersdk;
+error_reporting(0);
+class Wallet {
 
- $chain = $config['chain'];
- $url = $config['url'];
- $username = $config['rkuser'];
- $pass = $config['passwd'];
- $port = $config['port'];
+public $config;
 
-class wallet
+ function __construct(array $config) {
+     $this->chain = $config['chain'];
+     $this->url = $config['url'];
+     $this->username = $config['rkuser'];
+     $this->pass = $config['passwd'];
+     $this->port = $config['port'];
+ }
 
- {  
-function createwallet(){
-$curl = curl_init();
-curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
-    CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_ENCODING => "",
-    CURLOPT_MAXREDIRS => 10,
-    CURLOPT_TIMEOUT => 30,
-    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-    CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => "{\"method\":\"createkeypairs\",\"params\":[],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
-    CURLOPT_HTTPHEADER => array(
-        "cache-control: no-cache",
-        "content-type: application/json"
-    )
-));
-    error_log("Sending request: createkeypairs");
-    $result   = json_decode(curl_exec($curl));
-    $err      = curl_error($curl);
-    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-
-             $public_address=$result->result[0]->pubkey;
-             $private_key=$result->result[0]->privkey;
-             $Address=$result->result[0]->address;
-        
-        $myJSON = array("pubkey" => $public_address,"privkey" => $private_key,"address" =>$Address);
-        $json_string = json_encode($myJSON, JSON_PRETTY_PRINT);
-
-
-    return $json_string;
-    }
-
-
-
-
-    function importAddress($pubkey){
+function importAddress($public_address){
     $curl = curl_init();
     curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username . ":" . $this->pass,
     CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
@@ -62,33 +27,64 @@ curl_setopt_array($curl, array(
     CURLOPT_TIMEOUT => 30,
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => "{\"method\":\"importaddress\",\"params\":[\"pubkey\",[],false],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
+    CURLOPT_POSTFIELDS => "{\"method\":\"importaddress\",\"params\":[\"$public_address\",\"\", false],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
     CURLOPT_HTTPHEADER => array(
         "cache-control: no-cache",
         "content-type: application/json"
     )
 ));
-    error_log("Sending request: importaddress");
     $result   = json_decode(curl_exec($curl));
     $err      = curl_error($curl);
     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-    if ($httpCode == 200 && $result->error == null) {
-        
-        
-
-    } else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
-        error_log("ERROR: Info not fetched from blockchain");
+    $response= $result->result;
+    $error= $result->error;
+    if($response == null && $error== null){
+        return true;
+    } else if($response == null and $error != null) {
+        return false;
+    } else {
+        return $result->result->error;
     }
+}
 
-           
-     }
+function createWallet(){
+$curl = curl_init();
+curl_setopt_array($curl, array(
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username . ":" . $this->pass,
+    CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_ENCODING => "",
+    CURLOPT_MAXREDIRS => 10,
+    CURLOPT_TIMEOUT => 30,
+    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+    CURLOPT_CUSTOMREQUEST => "POST",
+    CURLOPT_POSTFIELDS => "{\"method\":\"createkeypairs\",\"params\":[],\"id\":1,\"chain_name\":\"" .$this->chain . "\"}",
+    CURLOPT_HTTPHEADER => array(
+        "cache-control: no-cache",
+        "content-type: application/json"
+    )
+));
+    $result   = json_decode(curl_exec($curl));
+    $err      = curl_error($curl);
+    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    $public_key=$result->result[0]->pubkey;
+    $private_key=$result->result[0]->privkey;
+    $public_address=$result->result[0]->address;
+    if($this->importAddress($public_address)){
+    $response = array("public_key" => $public_key,"private_key" => $private_key,"public_address" =>$public_address);
+    $wallet_credentials = json_encode($response, JSON_PRETTY_PRINT);
+    return $wallet_credentials;
+  }
+}
 
 function getPrivateKey($public_address) {
 $curl = curl_init();
 curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username . ":" . $this->pass,
     CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
@@ -96,33 +92,30 @@ curl_setopt_array($curl, array(
     CURLOPT_TIMEOUT => 30,
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => "{\"method\":\"dumpprivkey\",\"params\":[\"$public_address\"],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
+    CURLOPT_POSTFIELDS => "{\"method\":\"dumpprivkey\",\"params\":[\"$public_address\"],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
     CURLOPT_HTTPHEADER => array(
         "cache-control: no-cache",
         "content-type: application/json"
     )
 ));
-    error_log("Sending request: dumpprivkey");
     $result   = json_decode(curl_exec($curl));
     $err      = curl_error($curl);
     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-    // if ($httpCode == 200 && $result->error == null) {
-         //print_r($result);
-         if($result == null){
-            $prikey = $request->error->message;
-        } else {
-            $prikey = $result->result;
-         }
+    if($result == null){
+        $private_key = $request->error->message;
+    } else {
+        $private_key = $result->result;
+    }
 
-    return $prikey;
+    return $private_key;
     }
 
 function retrieveWalletinfo() {
 $curl = curl_init();
 curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username . ":" . $this->pass,
     CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
@@ -130,38 +123,36 @@ curl_setopt_array($curl, array(
     CURLOPT_TIMEOUT => 30,
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => "{\"method\":\"getwalletinfo\",\"params\":[],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
+    CURLOPT_POSTFIELDS => "{\"method\":\"getwalletinfo\",\"params\":[],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
     CURLOPT_HTTPHEADER => array(
         "cache-control: no-cache",
         "content-type: application/json"
     )
 ));
-    error_log("Sending request: getwalletinfo");
     $result   = json_decode(curl_exec($curl));
     $err      = curl_error($curl);
     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     if ($httpCode == 200 && $result->error == null) {
-       
         $balance = $result->result->balance;
         $tx_count = $result->result->txcount;
         $unspent_tx = $result->result->utxocount;
 
-    $myJSON = array("balance" => $balance,"txcount" => $tx_count,"utxocount" =>$unspent_tx);
-        $json_string = json_encode($myJSON, JSON_PRETTY_PRINT);
+    $response = array("balance" => $balance,"tx_count" => $tx_count,"unspent_tx" =>$unspent_tx);
+    $wallet_info = json_encode($response, JSON_PRETTY_PRINT);
 
     } else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
-        error_log("ERROR: Info not fetched from blockchain");
+    $wallet_info = $result->error->message;
     }
-    return $json_string;
+    return $wallet_info;
     }
 
 
 function backupWallet($filename) {
 $curl = curl_init();
 curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username . ":" . $this->pass,
     CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
@@ -169,35 +160,29 @@ curl_setopt_array($curl, array(
     CURLOPT_TIMEOUT => 30,
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => "{\"method\":\"backupwallet\",\"params\":[\"$filename\"],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
+    CURLOPT_POSTFIELDS => "{\"method\":\"backupwallet\",\"params\":[\"$filename\"],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
     CURLOPT_HTTPHEADER => array(
         "cache-control: no-cache",
         "content-type: application/json"
     )
 ));
-    error_log("Sending request: backupwallet");
     $result   = json_decode(curl_exec($curl));
     $err      = curl_error($curl);
     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-    if ($httpCode == 200 && $result->error == null) {
-         
-        if($result == null){
-            $res = "backup successfull !";
+    if($result == null){
+            $response = "Backup successfull.";
         } else {
-            $res = $result->error->message;
+            $response = $result->error->message;
         }
-    } else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
-        error_log("ERROR: Info not fetched from blockchain");
-    }
-    return $res;
+    return $response;
     }
 
 function importWallet($filename) {
 $curl = curl_init();
 curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username . ":" . $this->pass,
     CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
@@ -205,35 +190,29 @@ curl_setopt_array($curl, array(
     CURLOPT_TIMEOUT => 30,
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => "{\"method\":\"importwallet\",\"params\":[\"$filename\"],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
+    CURLOPT_POSTFIELDS => "{\"method\":\"importwallet\",\"params\":[\"$filename\"],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
     CURLOPT_HTTPHEADER => array(
         "cache-control: no-cache",
         "content-type: application/json"
     )
 ));
-    error_log("Sending request: importwallet");
     $result   = json_decode(curl_exec($curl));
     $err      = curl_error($curl);
     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-    if ($httpCode == 200 && $result->error == null) {
-         
-       if($result == null){
-            $res = "wallet is successfully imported!";
-        } else {
-            $res = $result->error->message;
-        }
-    } else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
-        error_log("ERROR: Info not fetched from blockchain");
+    if($result == null){
+        $response = "Wallet is successfully imported!";
+    } else {
+        $response = $result->error->message;
     }
-    return $res;
+    return $response;
     }
 
 function dumpWallet($filename) {
 $curl = curl_init();
 curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username . ":" . $this->pass,
     CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
@@ -241,35 +220,29 @@ curl_setopt_array($curl, array(
     CURLOPT_TIMEOUT => 30,
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => "{\"method\":\"dumpwallet\",\"params\":[\"$filename\"],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
+    CURLOPT_POSTFIELDS => "{\"method\":\"dumpwallet\",\"params\":[\"$filename\"],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
     CURLOPT_HTTPHEADER => array(
         "cache-control: no-cache",
         "content-type: application/json"
     )
 ));
-    error_log("Sending request: dumpwallet");
     $result   = json_decode(curl_exec($curl));
     $err      = curl_error($curl);
     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-    if ($httpCode == 200 && $result->error == null) {
-         
-          if($result == null){
-            $res = "wallet is successfully dumped!";
-        } else {
-            $res = $result->error->message;
+    if($result == null){
+        $response = "Wallet is successfully dumped!";
+    } else {
+        $response = $result->error->message;
         }
-    } else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
-        error_log("ERROR: Info not fetched from blockchain");
-    }
-    return $res;
+    return $response;
     }
 
 function lockWallet($password) {
 $curl = curl_init();
 curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username . ":" . $this->pass,
     CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
@@ -277,35 +250,29 @@ curl_setopt_array($curl, array(
     CURLOPT_TIMEOUT => 30,
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => "{\"method\":\"lockwallet\",\"params\":[\"$password\"],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
+    CURLOPT_POSTFIELDS => "{\"method\":\"lockwallet\",\"params\":[\"$password\"],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
     CURLOPT_HTTPHEADER => array(
         "cache-control: no-cache",
         "content-type: application/json"
     )
 ));
-    error_log("Sending request: lockwallet");
     $result   = json_decode(curl_exec($curl));
     $err      = curl_error($curl);
     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-    if ($httpCode == 200 && $result->error == null) {
-         
-          if($result == null){
-            $res = "wallet is successfully encrypted!";
-        } else {
-            $res = $result->error->message;
-        }
-    } else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
-        error_log("ERROR: Info not fetched from blockchain");
+    if($result == null){
+        $response = "wallet is successfully encrypted!";
+    } else {
+        $response = $result->error->message;
     }
-    return $res;
+    return $response;
     }
 
 function UnlockWallet($password,$unlocktime) {
 $curl = curl_init();
 curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username . ":" . $this->pass,
     CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
@@ -313,35 +280,29 @@ curl_setopt_array($curl, array(
     CURLOPT_TIMEOUT => 30,
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => "{\"method\":\"walletpassphrase\",\"params\":[\"$password\",\"$unlocktime\"],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
+    CURLOPT_POSTFIELDS => "{\"method\":\"walletpassphrase\",\"params\":[\"$password\",\"$unlocktime\"],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
     CURLOPT_HTTPHEADER => array(
         "cache-control: no-cache",
         "content-type: application/json"
     )
 ));
-    error_log("Sending request: walletpassphrase");
     $result   = json_decode(curl_exec($curl));
     $err      = curl_error($curl);
     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-    if ($httpCode == 200 && $result->error == null) {
-         
-          if($result == null){
-            $res = "wallet is successfully unlocked!";
+    if($result == null){
+        $response = "Wallet is successfully unlocked.";
         } else {
-            $res = $result->error->message;
+        $response = $result->error->message;
         }
-    } else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
-        error_log("ERROR: Info not fetched from blockchain");
-    }
-    return $res;
+    return $response;
     }
 
-function  changeWalletPassword($old_password,$new_password) {
+function changeWalletPassword($old_password,$new_password) {
 $curl = curl_init();
 curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username . ":" . $this->pass,
     CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
@@ -349,35 +310,29 @@ curl_setopt_array($curl, array(
     CURLOPT_TIMEOUT => 30,
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => "{\"method\":\"walletpassphrasechange\",\"params\":[\"$old_password\",\"$new_password\"],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
+    CURLOPT_POSTFIELDS => "{\"method\":\"walletpassphrasechange\",\"params\":[\"$old_password\",\"$new_password\"],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
     CURLOPT_HTTPHEADER => array(
         "cache-control: no-cache",
         "content-type: application/json"
     )
 ));
-    error_log("Sending request: walletpassphrasechange");
     $result   = json_decode(curl_exec($curl));
     $err      = curl_error($curl);
     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-    if ($httpCode == 200 && $result->error == null) {
-         
-          if($result == null){
-            $res = "password successfully changed";
-        } else {
-            $res = $result->error->message;
+    if($result == null){
+        $response = "Password successfully changed.";
+    } else {
+        $response = $result->error->message;
         }
-    } else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
-        error_log("ERROR: Info not fetched from blockchain!");
-    }
-    return $res;
+    return $response;
     }
 
-function  signMessage($private_key,$message) {
+function signMessage($private_key,$message) {
 $curl = curl_init();
 curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username . ":" . $this->pass,
     CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
@@ -385,31 +340,29 @@ curl_setopt_array($curl, array(
     CURLOPT_TIMEOUT => 30,
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => "{\"method\":\"signmessage\",\"params\":[\"$private_key\",\"$message\"],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
+    CURLOPT_POSTFIELDS => "{\"method\":\"signmessage\",\"params\":[\"$private_key\",\"$message\"],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
     CURLOPT_HTTPHEADER => array(
         "cache-control: no-cache",
         "content-type: application/json"
     )
 ));
-    error_log("Sending request: signmessage");
     $result   = json_decode(curl_exec($curl));
     $err      = curl_error($curl);
     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     if ($httpCode == 200 && $result->error == null) {
-        
-        $signmsg = $result->result;
+        $signedMsg = $result->result;
     } else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
-        error_log("ERROR: Info not fetched from blockchain!");
+        $signedMsg = $result->error->message;
     }
-    return $signmsg;
+    return $signedMsg;
     }
 
-function  verifyMessage($address,$signedmessage,$message) {
+function verifyMessage($address,$signedmessage,$message) {
 $curl = curl_init();
 curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username . ":" . $this->pass,
     CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
@@ -417,7 +370,7 @@ curl_setopt_array($curl, array(
     CURLOPT_TIMEOUT => 30,
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => "{\"method\":\"verifymessage\",\"params\":[\"$address\",\"$signedmessage\",\"$message\"],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
+    CURLOPT_POSTFIELDS => "{\"method\":\"verifymessage\",\"params\":[\"$address\",\"$signedmessage\",\"$message\"],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
     CURLOPT_HTTPHEADER => array(
         "cache-control: no-cache",
         "content-type: application/json"
@@ -427,26 +380,13 @@ curl_setopt_array($curl, array(
     $result   = json_decode(curl_exec($curl));
     $err      = curl_error($curl);
     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-    if ($httpCode == 200 && $result->error == null) {
-
-        $verify =$result->result;
-        
-            if ($verify==true){
-                $res = "Yes, message is verified";
-            }
-            else{
-                $res = "No, signedMessage is not correct";
-            }
-
-                   
-    } else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
-        error_log("ERROR: Info not fetched from blockchain!");
+    $verify =$result->result;
+    if ($verify==true){
+        $response = "Message is verified";
+    } else{
+        $response = "Message is not correct";
     }
-    return $res;
-    }
-
+    return $response;
+  }
 }
-// $testObject2 = new wallet();
-//  $res = $testObject2->verifyMessage();
-//  print_r($res);
- ?>
+?>

@@ -1,21 +1,27 @@
 <?php
 
- $config = include('../../../../config.php');
-$chain = $config['chain'];
-$url = $config['url'];
-$username = $config['rkuser'];
-$pass = $config['passwd'];
-$port = $config['port'];
+namespace recordskeeper\recordskeepersdk;
+error_reporting(0);
 
-class blockchain
+class Blockchain {  
 
-{  
-function getchaininfo(){
+  public $config;
+
+ function __construct(array $config) {
+     $this->chain = $config['chain'];
+     $this->url = $config['url'];
+     $this->username = $config['rkuser'];
+     $this->pass = $config['passwd'];
+     $this->port = $config['port'];
+ } 
+
+ 
+function getChainInfo(){
 $curl = curl_init();
 curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username . ":" . $this->pass,
     CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
@@ -23,53 +29,38 @@ curl_setopt_array($curl, array(
     CURLOPT_TIMEOUT => 30,
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => "{\"method\":\"getblockchainparams\",\"params\":[],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
+    CURLOPT_POSTFIELDS => "{\"method\":\"getblockchainparams\",\"params\":[],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
     CURLOPT_HTTPHEADER => array(
         "cache-control: no-cache",
         "content-type: application/json"
     )
 ));
-    error_log("Sending request: getblockchainparams");
     $result   = json_decode(curl_exec($curl));
     $err      = curl_error($curl);
     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     if ($httpCode == 200 && $result->error == null) {
-            
-        $chaininfo = $result->result;
-      
+        $chaininfo = (array)$result->result;
+        $chain_protocol = $chaininfo['chain-protocol'];
+        $chain_description = $chaininfo['chain-description'];
+        $root_stream= $chaininfo['root-stream-name'];
+        $max_blocksize = $chaininfo['maximum-block-size'];
+        $default_networkport= $chaininfo['default-network-port'];
+        $default_rpcport = $chaininfo['default-rpc-port'];
+        $mining_diversity = $chaininfo['mining-diversity'];
+        $response = array("chain-protocol" => $chain_protocol,"chain-description" => $chain_description,"root-stream-name" =>$root_stream,"maximum-block-size" =>$max_blocksize,"default-network-port" =>$default_networkport,"default-rpc-port" =>$default_rpcport,"mining-diversity" =>$mining_diversity);
+        $chain_info = json_encode($response, JSON_PRETTY_PRINT);
+} else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
+        $chain_info = $result->error->message;
+}
+    return $chain_info;
+}
 
-        $array =  (array) $chaininfo;
-        
-
-
-        $chain_protocol = $array['chain-protocol'];
-        $chain_description = $array['chain-description'];
-        $root_stream= $array['root-stream-name'];
-        $max_blocksize = $array['maximum-block-size'];
-        $default_networkport= $array['default-network-port'];
-        $default_rpcport = $array['default-rpc-port'];
-        $mining_diversity = $array['mining-diversity'];
-        
-        $myJSON = array("chain-protocol" => $chain_protocol,"chain-description" => $chain_description,"root-stream-name" =>$root_stream,"maximum-block-size" =>$max_blocksize,"default-network-port" =>$default_networkport,"default-rpc-port" =>$default_rpcport,"mining-diversity" =>$mining_diversity);
-        $jsonstring = json_encode($myJSON, JSON_PRETTY_PRINT);
-        
-
-      
-     } 
-
-     else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
-        $jsonstring = "ERROR: Info not fetched from blockchain";
-    }
-
-     return $jsonstring;
-    }
-
-function getnodeinfo(){
+function getNodeInfo(){
 $curl = curl_init();
 curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username . ":" . $this->pass,
     CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
@@ -77,7 +68,7 @@ curl_setopt_array($curl, array(
     CURLOPT_TIMEOUT => 30,
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => "{\"method\":\"getinfo\",\"params\":[],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
+    CURLOPT_POSTFIELDS => "{\"method\":\"getinfo\",\"params\":[],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
     CURLOPT_HTTPHEADER => array(
         "cache-control: no-cache",
         "content-type: application/json"
@@ -88,32 +79,27 @@ curl_setopt_array($curl, array(
     $err      = curl_error($curl);
     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     if ($httpCode == 200 && $result->error == null) {
-
         $node_balance = $result->result->balance;
         $synced_blocks = $result->result->blocks;
         $node_address =$result->result->nodeaddress;
         $difficulty =$result->result->difficulty;
 
-         $myJSON = array("balance" => $node_balance,"blocks" => $synced_blocks,"nodeaddress" =>$node_address,"difficulty" =>$difficulty);
-        $jsonstring = json_encode($myJSON, JSON_PRETTY_PRINT);
-       
-        
-     } 
+        $response = array("balance" => $node_balance,"blocks" => $synced_blocks,"nodeaddress" =>$node_address,"difficulty" =>$difficulty);
+        $node_info = json_encode($response, JSON_PRETTY_PRINT);
+       } 
 
      else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
-        error_log("ERROR: Info not fetched from blockchain");
+        $node_info = $result->error->message;
+    }
+        return $node_info;
     }
 
-
-    return $jsonstring;
-    }
-
-function permissions(){
+function Permissions(){
 $curl = curl_init();
 curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username . ":" . $this->pass,
     CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
@@ -121,44 +107,35 @@ curl_setopt_array($curl, array(
     CURLOPT_TIMEOUT => 30,
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => "{\"method\":\"listpermissions\",\"params\":[],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
+    CURLOPT_POSTFIELDS => "{\"method\":\"listpermissions\",\"params\":[],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
     CURLOPT_HTTPHEADER => array(
         "cache-control: no-cache",
         "content-type: application/json"
     )
 ));
-    error_log("Sending request: listpermissions");
     $result   = json_decode(curl_exec($curl));
     $err      = curl_error($curl);
     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     if ($httpCode == 200 && $result->error == null) {
-
-        
         $count = count($result->result);
         $permissions = [];
-        
     for ($i = 0; $i <$count; $i++) {
-      $perm = $result->result[$i]->type;
-      array_push($permissions,$perm);
+      $type = $result->result[$i]->type;
+      array_push($permissions,$type);
+    }
+    $permissions = json_encode($permissions, JSON_PRETTY_PRINT);
+}  else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
+        $permissions = $result->error->message;
+    }
+return $permissions; 
     }
 
-
-      }  
-      
-
-     else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
-        error_log("ERROR: Info not fetched from blockchain");
-    }
-
-    return $permissions;
-    }
-
-function getpendingtransactions(){
+function getPendingTransactions(){
 $curl = curl_init();
 curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username . ":" . $this->pass,
     CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
@@ -166,25 +143,22 @@ curl_setopt_array($curl, array(
     CURLOPT_TIMEOUT => 30,
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => "{\"method\":\"getmempoolinfo\",\"params\":[],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
+    CURLOPT_POSTFIELDS => "{\"method\":\"getmempoolinfo\",\"params\":[],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
     CURLOPT_HTTPHEADER => array(
         "cache-control: no-cache",
         "content-type: application/json"
     )
 ));
-    error_log("Sending request: getmempoolinfo");
     $result   = json_decode(curl_exec($curl));
     $err      = curl_error($curl);
     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     if ($httpCode == 200 && $result->error == null) {
-
         $mempool = $result->result->size; 
-
     $curl = curl_init();
     curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username . ":" . $this->pass,
     CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
@@ -192,54 +166,43 @@ curl_setopt_array($curl, array(
     CURLOPT_TIMEOUT => 30,
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => "{\"method\":\"getrawmempool\",\"params\":[],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
+    CURLOPT_POSTFIELDS => "{\"method\":\"getrawmempool\",\"params\":[],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
     CURLOPT_HTTPHEADER => array(
         "cache-control: no-cache",
         "content-type: application/json"
     )
 ));
-    error_log("Sending request: getrawmempool");
     $result   = json_decode(curl_exec($curl));
     $err      = curl_error($curl);
     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-     
-
-      $count = count($result->result);
-     
-       $tx = [];
-     
-     for ($i = 0; $i < $mempool;$i++) {
-
-     $tx_info = $result->result[$i];
+    $tx_count = count($result->result);
+    $tx = [];
+    for ($i = 0; $i < $mempool;$i++) {
+    $tx_info = $result->result[$i];
        array_push($tx, $tx_info);
-
-
-    }
-       
-
-     $myJSON = array("tx" => $tx,"count" => $count);
-     $json_string = json_encode($myJSON, JSON_PRETTY_PRINT);  
+}
+    $res = array("tx" => $tx,"tx_count" => $tx_count);
+    $json_response = json_encode($res, JSON_PRETTY_PRINT);  
 
       if ($tx_info==null)
       {
-        $res="No pending transactions";
-      }
-      else{
-        $res = $json_string;
+        $pending_tx = "No pending transactions";
+      } else{
+        $pending_tx = $json_response;
         }
 
-     return $res;
+     return $pending_tx;
     }
-    }
+}
 
 
 
-function checknodebalance(){
+function checkNodeBalance(){
 $curl = curl_init();
 curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username . ":" . $this->pass,
     CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
@@ -247,7 +210,7 @@ curl_setopt_array($curl, array(
     CURLOPT_TIMEOUT => 30,
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => "{\"method\":\"getmultibalances\",\"params\":[],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
+    CURLOPT_POSTFIELDS => "{\"method\":\"getmultibalances\",\"params\":[],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
     CURLOPT_HTTPHEADER => array(
         "cache-control: no-cache",
         "content-type: application/json"
@@ -258,24 +221,12 @@ curl_setopt_array($curl, array(
     $err      = curl_error($curl);
     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     if ($httpCode == 200 && $result->error == null) {
-
-       
-        $nodebal = $result->result->total[0]->qty;
-        
-      }  
-      
-
-     else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
-        error_log("ERROR: Info not fetched from blockchain");
+    $node_balance = $result->result->total[0]->qty;
+    } else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
+    $node_balance = $result->error->message;
     }
 
-    return $nodebal;
+    return $node_balance;
     }
 }
-
-
-
-// $testObject2 = new blockchain();
-// $res = $testObject2->getpendingtransactions();
-// print_r($res);
 ?>

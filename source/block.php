@@ -1,20 +1,26 @@
 <?php
 
- $config = include('../../../../config.php');
- $chain = $config['chain'];
- $url = $config['url'];
- $username = $config['rkuser'];
- $pass = $config['passwd'];
- $port = $config['port'];
+namespace recordskeeper\recordskeepersdk;
+error_reporting(0);
 
-class block
-{  
-function blockinfo($block_height){
+class Block { 
+
+public $config;
+
+ function __construct(array $config) {
+     $this->chain = $config['chain'];
+     $this->url = $config['url'];
+     $this->username = $config['rkuser'];
+     $this->pass = $config['passwd'];
+     $this->port = $config['port'];
+ }  
+
+function blockInfo($block_height){
 $curl = curl_init();
 curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username . ":" . $this->pass,
     CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
@@ -22,19 +28,17 @@ curl_setopt_array($curl, array(
     CURLOPT_TIMEOUT => 30,
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => "{\"method\":\"getblock\",\"params\":[\"$block_height\"],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
+    CURLOPT_POSTFIELDS => "{\"method\":\"getblock\",\"params\":[\"$block_height\"],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
     CURLOPT_HTTPHEADER => array(
         "cache-control: no-cache",
         "content-type: application/json"
     )
 ));
-  error_log("Sending request: getblock");
   $result   = json_decode(curl_exec($curl));
   $err      = curl_error($curl);
   $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
   if ($httpCode == 200 && $result->error == null) {    
-      $block =count($result->result->tx);
-     
+      $tx_count =count($result->result->tx);
       $miner =$result->result->miner;
       $size =$result->result->size;
       $nonce =$result->result->nonce;
@@ -44,26 +48,25 @@ curl_setopt_array($curl, array(
       $merkleroot=$result->result->merkleroot;
       $blocktime =$result->result->time;
       $difficulty=$result->result->difficulty;
-
-       $tx=[];
-       for($i=0;$i<$block;$i++){
+      $tx=[];
+      for($i=0;$i<$tx_count;$i++){
           array_push($tx, $result->result->tx[$i]);
        }
-      $myJSON = array("tx[0]" => $block,"tx"=> $tx ,"miner" => $miner,"size" =>$size,"nonce" =>$nonce,"hash" =>$blockhash,"previousblockhash" =>$prevblock,"nextblockhash" =>$nextblock,"merkleroot" =>$merkleroot,"time" =>$blocktime,"difficulty" =>$difficulty);
-      $jsonstring = json_encode($myJSON, JSON_PRETTY_PRINT);
+      $response = array("tx_count" => $tx_count,"tx"=> $tx ,"miner" => $miner,"size" =>$size,"nonce" =>$nonce,"hash" =>$blockhash,"previousblockhash" =>$prevblock,"nextblockhash" =>$nextblock,"merkleroot" =>$merkleroot,"time" =>$blocktime,"difficulty" =>$difficulty);
+      $block_info = json_encode($response, JSON_PRETTY_PRINT);
        
   } else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
-      error_log("ERROR: Info not fetched from blockchain");
+      $block_info = $result->error->message;
   }
-   return $jsonstring;
+   return $$block_info;
   }
 
-function retreiveblocks($block_range){
+function retrieveBlocks($block_range){
 $curl = curl_init();
 curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username . ":" . $this->pass,
     CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
@@ -71,51 +74,39 @@ curl_setopt_array($curl, array(
     CURLOPT_TIMEOUT => 30,
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => "{\"method\":\"listblocks\",\"params\":[\"$block_range\"],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
+    CURLOPT_POSTFIELDS => "{\"method\":\"listblocks\",\"params\":[\"$block_range\"],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
     CURLOPT_HTTPHEADER => array(
         "cache-control: no-cache",
         "content-type: application/json"
     )
 ));
-  error_log("Sending request: listblocks");
   $result   = json_decode(curl_exec($curl));
   $err      = curl_error($curl);
   $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
   if ($httpCode == 200 && $result->error == null) {
-           
-      $block =count($result->result);
-
-       $allresult1=[];
-       $hash= [];
-       $miner=[];
-       $blocktime=[];
-       $tx_count=[];
-
-        for($i=0;$i<$block;$i++){
-          $hash1= $result->result[$i]->hash;
-          
-          $miner1=$result->result[$i]->miner;
-          
-          $blocktime1=$result->result[$i]->time;
-          
-          $tx_count1=$result->result[$i]->txcount;
-
-           array_push($hash, $hash1);
-        array_push($miner, $miner1);
-         array_push($blocktime, $blocktime1);
-          array_push($tx_count, $tx_count1);
-          
-
-       }
-       $myJSON = array("miner" => $miner,"hash"=> $hash ,"time" =>$blocktime,"txcount" =>$tx_count);
-       $jsonstring = json_encode($myJSON, JSON_PRETTY_PRINT);
+      $block_count =count($result->result);
+      $total_hash= [];
+      $total_miner=[];
+      $total_blocktime=[];
+      $total_tx_count=[];
       
-      
-
-    return $jsonstring;
-
+      for($i=0;$i<$block_count;$i++){
+        $hash= $result->result[$i]->hash;
+        $miner=$result->result[$i]->miner;
+        $blocktime=$result->result[$i]->time;
+        $tx_count=$result->result[$i]->txcount;
+        array_push($total_hash, $hash);
+        array_push($total_miner, $miner);
+        array_push($total_blocktime, $blocktime);
+        array_push($total_tx_count, $tx_count);
+    }
+       $response = array("miner" => $total_miner,"hash"=> $total_hash ,"block_time" =>$total_blocktime,"total_txcount" =>$total_tx_count);
+       $block_info = json_encode($response, JSON_PRETTY_PRINT);
+      } else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
+      $block_info = $result->error->message;
   }
-}
+  return $block_info;
+  }
 }
 
 ?>

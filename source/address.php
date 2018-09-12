@@ -1,23 +1,26 @@
 <?php
+namespace recordskeeper\recordskeepersdk;
+error_reporting(0);
 
- $config = include('../../../../config.php');
- $chain = $config['chain'];
- $url = $config['url'];
- $username = $config['rkuser'];
- $pass = $config['passwd'];
- $port = $config['port'];
+class Address {
 
-namespace recordskeeper/recordskeepersdk; 
+ public $config;
 
-class address
+ function __construct(array $config) {
+     $this->chain = $config['chain'];
+     $this->url = $config['url'];
+     $this->username = $config['rkuser'];
+     $this->pass = $config['passwd'];
+     $this->port = $config['port'];
+ }  
 
- {  
+
 function getAddress(){
 $curl = curl_init();
 curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username . ":" . $this->pass,
     CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
@@ -25,229 +28,34 @@ curl_setopt_array($curl, array(
     CURLOPT_TIMEOUT => 30,
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => "{\"method\":\"getnewaddress\",\"params\":[],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
+    CURLOPT_POSTFIELDS => "{\"method\":\"getnewaddress\",\"params\":[],\"id\":1,\"chain_name\":\"" . $this->chain. "\"}",
     CURLOPT_HTTPHEADER => array(
         "cache-control: no-cache",
         "content-type: application/json"
     )
 ));
-    error_log("Sending request: getnewaddress");
     $result   = json_decode(curl_exec($curl));
     $err      = curl_error($curl);
     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     if ($httpCode == 200 && $result->error == null) {
-             //print_r($result);
         $address = $result->result;
     } else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
-        error_log("ERROR: Info not fetched from blockchain");
+        $address = $result->error->message;
     }
     return $address;
     }
 
-
-
-// $testObject = new address();
-// $res = $testObject->getAddress();       
-// echo($res);
-
-
-
-
-function retrieveAddresses() {
-$curl = curl_init();
-curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
-    CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_ENCODING => "",
-    CURLOPT_MAXREDIRS => 10,
-    CURLOPT_TIMEOUT => 30,
-    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-    CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => "{\"method\":\"getaddresses\",\"params\":[],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
-    CURLOPT_HTTPHEADER => array(
-        "cache-control: no-cache",
-        "content-type: application/json"
-    )
-    ));
-    error_log("Sending request: getaddresses");
-    $result   = json_decode(curl_exec($curl));
-    $err      = curl_error($curl);
-    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-    if ($httpCode == 200 && $result->error == null) {
-         //print_r($result);
-        $addresses = $result->result;
-    } else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
-        error_log("ERROR: Info not fetched from blockchain");
-    }
-    return $addresses;    
-    }
-
-function checkifvalid($address) {
-$curl = curl_init();
-curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
-    CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_ENCODING => "",
-    CURLOPT_MAXREDIRS => 10,
-    CURLOPT_TIMEOUT => 30,
-    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-    CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => "{\"method\":\"validateaddress\",\"params\":[\"$address\"],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
-    CURLOPT_HTTPHEADER => array(
-        "cache-control: no-cache",
-        "content-type: application/json"
-    )
-));
-    error_log("Sending request: validateaddress");
-    $result   = json_decode(curl_exec($curl));
-    $err      = curl_error($curl);
-    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-    if ($httpCode == 200 && $result->error == null) {
-         //print_r($result);
-        $valaddress = $result->result->isvalid;
-        if($valaddress == 1){
-            $status = "Address is valid";
-        } else {
-            $status = "Address is not valid";
-        }
-    } else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
-        error_log("ERROR: Info not fetched from blockchain");
-    }
-    return $status;
-    }
-
-
-function checkifmineallowed($address) {
-$curl = curl_init();
-curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
-    CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_ENCODING => "",
-    CURLOPT_MAXREDIRS => 10,
-    CURLOPT_TIMEOUT => 30,
-    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-    CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => "{\"method\":\"validateaddress\",\"params\":[\"$address\"],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
-    CURLOPT_HTTPHEADER => array(
-        "cache-control: no-cache",
-        "content-type: application/json"
-    )
-));
-    error_log("Sending request: validateaddress");
-    $result   = json_decode(curl_exec($curl));
-    $err      = curl_error($curl);
-    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-    if ($httpCode == 200 && $result->error == null) {
-         //print_r($result);
-        $valaddress = $result->result->ismine;
-        if($valaddress == 1){
-            $status = "Address has mining permission";
-        } else {
-            $status = "Address has not given mining permission";
-        }
-    } else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
-        error_log("ERROR: Info not fetched from blockchain");
-    }
-    return $status;
-    }
-
-function checkBalance($address) {
-$curl = curl_init();
-curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
-    CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_ENCODING => "",
-    CURLOPT_MAXREDIRS => 10,
-    CURLOPT_TIMEOUT => 30,
-    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-    CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => "{\"method\":\"getaddressbalances\",\"params\":[\"$address\"],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
-    CURLOPT_HTTPHEADER => array(
-        "cache-control: no-cache",
-        "content-type: application/json"
-    )
-));
-    error_log("Sending request: getaddressbalances");
-    $result   = json_decode(curl_exec($curl));
-
-    $err      = curl_error($curl);
-    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-    if ($httpCode == 200 && $result->error == null) {
-        
-        $balance = $result->result[0]->qty;
-        
-    } else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
-        error_log("ERROR: Info not fetched from blockchain");
-    }
-    return $balance;
-    }
-
-function importAddress($public_address) {
-$curl = curl_init();
-curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
-    CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_ENCODING => "",
-    CURLOPT_MAXREDIRS => 10,
-    CURLOPT_TIMEOUT => 30,
-    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-    CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => "{\"method\":\"importaddress\",\"params\":[\"$public_address\",\"\", false],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
-    CURLOPT_HTTPHEADER => array(
-        "cache-control: no-cache",
-        "content-type: application/json"
-    )
-));
-    error_log("Sending request: importaddress");
-    $result   = json_decode(curl_exec($curl));
-    $err      = curl_error($curl);
-    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-
-        
-        $resu= $result->result;
-        
-        $error= $result->error;
-
-        
-
-        if($resu == null && $error== null){
-            $print = "Address successfully imported";
-        }
-        else if($resu == null and $error != null) {
-        $print = $result->error->message;
-        }
-        
-
-    return $print;
-    }
-
 function getMultisigAddress($nrequired,$key) {
 
-$myArray = explode(',',$key);
-
-$myArray2 = implode('","', $myArray);
+$keys = explode(',',$key);
+$public_keys = implode('","', $keys);
 
 
 $curl = curl_init();
 curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username . ":" . $this->pass,
     CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
@@ -255,37 +63,22 @@ curl_setopt_array($curl, array(
     CURLOPT_TIMEOUT => 30,
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => "POST",
-        CURLOPT_POSTFIELDS => "{\"method\":\"createmultisig\",\"params\":[$nrequired, [\"$myArray2\"]],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
+        CURLOPT_POSTFIELDS => "{\"method\":\"createmultisig\",\"params\":[$nrequired, [\"$public_keys\"]],\"id\":1,\"chain_name\":\"" . $this->chain. "\"}",
     CURLOPT_HTTPHEADER => array(
         "cache-control: no-cache",
         "content-type: application/json"
     )
 ));
-    error_log("Sending request: createmultisig");
     $result   = json_decode(curl_exec($curl));
-
     $err      = curl_error($curl);
     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-
-    if ($httpCode == 200 && $result->error == null) {
-
-        
-         $address = $result->result->address;
-
-          if($address == null) {
-            $res= $result->result->error->message;
+    $response = $result->result->address;
+    if($response == null) {
+            $MultisigAddress= $result->error->message;
+    } else {
+            $MultisigAddress= $result->result->address;
         }
-        else {
-            $res= $result->result->address;
-        }
-
-
-
-
-    } else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
-        error_log("ERROR: Info not fetched from blockchain");
-    }
-    return $res;
+    return $MultisigAddress;
     }
 
 function getMultisigwalletAddress($nrequired,$key) {
@@ -297,9 +90,9 @@ $myArray2 = implode('","', $myArray);
 
 $curl = curl_init();
 curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username . ":" . $this->pass,
     CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
@@ -307,36 +100,189 @@ curl_setopt_array($curl, array(
     CURLOPT_TIMEOUT => 30,
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => "POST",
-        CURLOPT_POSTFIELDS => "{\"method\":\"addmultisigaddress\",\"params\":[$nrequired, [\"$myArray2\"]],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
+        CURLOPT_POSTFIELDS => "{\"method\":\"addmultisigaddress\",\"params\":[$nrequired, [\"$myArray2\"]],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
     CURLOPT_HTTPHEADER => array(
         "cache-control: no-cache",
         "content-type: application/json"
     )
 ));
-    error_log("Sending request: addmultisigaddress");
+    $result   = json_decode(curl_exec($curl));
+    $err      = curl_error($curl);
+    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    $response = $result->result->address;
+    if($response == null) {
+            $MultisigAddress= $result->error->message;
+    } else {
+            $MultisigAddress= $result->result->address;
+        }
+    return $MultisigAddress;
+    }
+
+function retrieveAddresses() {
+$curl = curl_init();
+curl_setopt_array($curl, array(
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username . ":" . $this->pass,
+    CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_ENCODING => "",
+    CURLOPT_MAXREDIRS => 10,
+    CURLOPT_TIMEOUT => 30,
+    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+    CURLOPT_CUSTOMREQUEST => "POST",
+    CURLOPT_POSTFIELDS => "{\"method\":\"getaddresses\",\"params\":[],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
+    CURLOPT_HTTPHEADER => array(
+        "cache-control: no-cache",
+        "content-type: application/json"
+    )
+    ));
+    $result   = json_decode(curl_exec($curl));
+    $err      = curl_error($curl);
+    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    if ($httpCode == 200 && $result->error == null) {
+        $addresses = $result->result;
+        $address_count = count($addresses);
+        $response = array("addresses"=> $addresses, "address_count"=> $address_count);
+        $addresses = json_encode($response, JSON_PRETTY_PRINT);
+    } else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
+        $addresses = $result->error->message;
+    }
+    return $addresses;    
+    }
+
+function checkIfValid($address) {
+$curl = curl_init();
+curl_setopt_array($curl, array(
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username . ":" . $this->pass,
+    CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_ENCODING => "",
+    CURLOPT_MAXREDIRS => 10,
+    CURLOPT_TIMEOUT => 30,
+    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+    CURLOPT_CUSTOMREQUEST => "POST",
+    CURLOPT_POSTFIELDS => "{\"method\":\"validateaddress\",\"params\":[\"$address\"],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
+    CURLOPT_HTTPHEADER => array(
+        "cache-control: no-cache",
+        "content-type: application/json"
+    )
+));
+    $result   = json_decode(curl_exec($curl));
+    $err      = curl_error($curl);
+    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    $valaddress = $result->result->isvalid;
+        if($valaddress == 1){
+            $status = "Address is valid";
+        } else {
+            $status = "Address is not valid";
+        }
+    return $status;
+    }
+
+
+function checkIfMineAllowed($address) {
+$curl = curl_init();
+curl_setopt_array($curl, array(
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username . ":" . $this->pass,
+    CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_ENCODING => "",
+    CURLOPT_MAXREDIRS => 10,
+    CURLOPT_TIMEOUT => 30,
+    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+    CURLOPT_CUSTOMREQUEST => "POST",
+    CURLOPT_POSTFIELDS => "{\"method\":\"validateaddress\",\"params\":[\"$address\"],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
+    CURLOPT_HTTPHEADER => array(
+        "cache-control: no-cache",
+        "content-type: application/json"
+    )
+));
+    $result   = json_decode(curl_exec($curl));
+    $err      = curl_error($curl);
+    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    $valaddress = $result->result->isvalid;
+        if($valaddress == 1){
+            $permission = $result->result->ismine;
+            if($permission == 1){
+            $status = "Address has mining permission";
+        } else {
+            $status = "Address has not given mining permission";
+        }
+    } else {
+        $status = "Invalid address, please check for valid address";
+    }
+    return $status;
+}
+
+function checkBalance($address) {
+$curl = curl_init();
+curl_setopt_array($curl, array(
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username . ":" . $this->pass,
+    CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_ENCODING => "",
+    CURLOPT_MAXREDIRS => 10,
+    CURLOPT_TIMEOUT => 30,
+    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+    CURLOPT_CUSTOMREQUEST => "POST",
+    CURLOPT_POSTFIELDS => "{\"method\":\"getaddressbalances\",\"params\":[\"$address\"],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
+    CURLOPT_HTTPHEADER => array(
+        "cache-control: no-cache",
+        "content-type: application/json"
+    )
+));
     $result   = json_decode(curl_exec($curl));
 
     $err      = curl_error($curl);
     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-
     if ($httpCode == 200 && $result->error == null) {
-         
-         $address = $result->result;
-
-          if($address == null) {
-            $res = $result->result->error->message;
-        }
-        else {
-            $res = $result->result;
-        }
-
+        
+        $balance = $result->result[0]->qty;
+        
     } else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
-        error_log("ERROR: Info not fetched from blockchain");
+        $balance = $result->error->message;
     }
-    return $res;
+    return $balance;
     }
 
-
+function importAddress($public_address) {
+$curl = curl_init();
+curl_setopt_array($curl, array(
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username . ":" . $this->pass,
+    CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_ENCODING => "",
+    CURLOPT_MAXREDIRS => 10,
+    CURLOPT_TIMEOUT => 30,
+    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+    CURLOPT_CUSTOMREQUEST => "POST",
+    CURLOPT_POSTFIELDS => "{\"method\":\"importaddress\",\"params\":[\"$public_address\",\"\", false],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
+    CURLOPT_HTTPHEADER => array(
+        "cache-control: no-cache",
+        "content-type: application/json"
+    )
+));
+    $result   = json_decode(curl_exec($curl));
+    $err      = curl_error($curl);
+    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    $response= $result->result;
+    $error= $result->error;
+    if($response == null && $error== null){
+        $status = "Address successfully imported";
+    } else if($response == null and $error != null) {
+        $status = $result->error->message;
+    }
+        return $status;
+    }
 }
 
 ?>

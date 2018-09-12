@@ -1,22 +1,26 @@
 <?php
 
- $config = include('../../../../config.php');
+namespace recordskeeper\recordskeepersdk;
+error_reporting(0);
 
- $chain = $config['chain'];
- $url = $config['url'];
- $username = $config['rkuser'];
- $pass = $config['passwd'];
- $port = $config['port'];
+class Permissions {
 
-class permissions
+ public $config;
 
- {  
-function grantpermissions($address,$permissions){
+ function __construct(array $config) {
+     $this->chain = $config['chain'];
+     $this->url = $config['url'];
+     $this->username = $config['rkuser'];
+     $this->pass = $config['passwd'];
+     $this->port = $config['port'];
+ } 
+   
+function grantPermissions($address,$permissions){
 $curl = curl_init();
 curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username . ":" . $this->pass,
     CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
@@ -24,38 +28,29 @@ curl_setopt_array($curl, array(
     CURLOPT_TIMEOUT => 30,
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => "{\"method\":\"grant\",\"params\":[\"$address\",\"$permissions\"],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
+    CURLOPT_POSTFIELDS => "{\"method\":\"grant\",\"params\":[\"$address\",\"$permissions\"],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
     CURLOPT_HTTPHEADER => array(
         "cache-control: no-cache",
         "content-type: application/json"
     )
 ));
-    error_log("Sending request: grant");
     $result   = json_decode(curl_exec($curl));
     $err      = curl_error($curl);
     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-    if ($httpCode == 200 && $result->error == null) {
-        
-        if($result == null){
-            $print = $result->error->message;
-        } else {
-            $print = $result->result;
-        }
-        
-
-    } else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
-        error_log("ERROR: Info not fetched from blockchain");
+    if($result == null){
+        $response = $result->error->message;
+    } else {
+        $response = $result->result;
+    }
+    return $response;
     }
 
-    return $print;
-    }
-
-function revokepermissions($address,$permissions){
+function revokePermissions($address,$permissions){
 $curl = curl_init();
 curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username . ":" . $this->pass,
     CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
@@ -63,32 +58,22 @@ curl_setopt_array($curl, array(
     CURLOPT_TIMEOUT => 30,
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => "{\"method\":\"revoke\",\"params\":[\"$address\",\"$permissions\"],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
+    CURLOPT_POSTFIELDS => "{\"method\":\"revoke\",\"params\":[\"$address\",\"$permissions\"],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
     CURLOPT_HTTPHEADER => array(
         "cache-control: no-cache",
         "content-type: application/json"
     )
 ));
-    error_log("Sending request: revoke");
     $result   = json_decode(curl_exec($curl));
     $err      = curl_error($curl);
     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-    if ($httpCode == 200 && $result->error == null) {
-             
-         if($result == null){
-            $print = $result->error->message;
+    if($result == null){
+        $response = $result->error->message;
         } else {
-            $print = $result->result;
+        $response = $result->result;
         }
-        
-
-    } else if ($httpCode != 200 || ($httpCode == 200 && $result->error != null)) {
-        error_log("ERROR: Info not fetched from blockchain");
+    return $response;
     }
-
-    return $print;
-    }
-
 }
 
 ?>

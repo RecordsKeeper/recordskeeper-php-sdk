@@ -1,29 +1,27 @@
 <?php
 
+namespace recordskeeper\recordskeepersdk;
+error_reporting(0);
+class Transaction {
 
- $config = include('../../../../config.php');
+    public $config;
 
-
- $chain = $config['chain'];
- $url = $config['url'];
- $username = $config['rkuser'];
- $pass = $config['passwd'];
- $port = $config['port'];
-
-
-
-
-class Transaction
-{
-	function sendtransaction($sender_address,$receiver_address,$data,$amount) {
+ function __construct(array $config) {
+     $this->chain = $config['chain'];
+     $this->url = $config['url'];
+     $this->username = $config['rkuser'];
+     $this->pass = $config['passwd'];
+     $this->port = $config['port'];
+ } 
+	function sendTransaction($sender_address,$receiver_address,$data,$amount) {
     
     $hex_data = bin2hex($data);
 
     $curl = curl_init();
     curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username. ":" . $this->pass,
     CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
@@ -32,29 +30,32 @@ class Transaction
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => "POST",
     CURLOPT_POSTFIELDS => "{\"method\":\"createrawsendfrom\",\"params\":[\"$sender_address\",{\"$receiver_address\" 
-         :  $amount}, [\"$hex_data\"], \"send\"],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
+         :  $amount}, [\"$hex_data\"], \"send\"],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
     CURLOPT_HTTPHEADER => array(
         "cache-control: no-cache",
         "content-type: application/json"
     )
 ));
-    error_log("Sending request: createrawsendfrom");
     $result   = json_decode(curl_exec($curl));
-
     $err      = curl_error($curl);
     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     $txid = $result->result;
+    if($txid == null){
+        $txid =  $result->error->message;
+    } else {
+        $txid = $txid;
+        }
     return $txid;
     }
 
-function createrawtransaction($sender_address,$receiver_address,$data,$amount) {
-        $hex_data = bin2hex($data);
+function createRawTransaction($sender_address,$receiver_address,$data,$amount) {
+$hex_data = bin2hex($data);
      
 $curl = curl_init();
 curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username. ":" . $this->pass,
     CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
@@ -63,30 +64,32 @@ curl_setopt_array($curl, array(
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => "POST",
     CURLOPT_POSTFIELDS => "{\"method\":\"createrawsendfrom\",\"params\":[\"$sender_address\",{\"$receiver_address\" 
-         :  $amount}, [\"$hex_data\"]],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
+         :  $amount}, [\"$hex_data\"]],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
     CURLOPT_HTTPHEADER => array(
         "cache-control: no-cache",
         "content-type: application/json"
     )
 ));
-    error_log("Sending request: createrawsendfrom");
     $result   = json_decode(curl_exec($curl));
-
     $err      = curl_error($curl);
     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-
-        $createraw = $result->result;
-
-    return $createraw;
+    $txHex = $result->result;
+    if($txHex == null){
+        $txHex =  $result->error->message;
+    } else {
+        $txHex = $txid;
+        }
+    return $txHex;
     }
 
-function signrawtransaction($tx_hex,$private_key) {
+
+function signRawTransaction($tx_hex,$private_key) {
 
 $curl = curl_init();
 curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username. ":" . $this->pass,
     CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
@@ -94,37 +97,33 @@ curl_setopt_array($curl, array(
     CURLOPT_TIMEOUT => 30,
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => "{\"method\":\"signrawtransaction\",\"params\":[\"$tx_hex\",[],[\"$private_key\"]],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
+    CURLOPT_POSTFIELDS => "{\"method\":\"signrawtransaction\",\"params\":[\"$tx_hex\",[],[\"$private_key\"]],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
     CURLOPT_HTTPHEADER => array(
         "cache-control: no-cache",
         "content-type: application/json"
     )
 ));
-    error_log("Sending request: signrawtransaction");
     $result   = json_decode(curl_exec($curl));
-
     $err      = curl_error($curl);
     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-
-         $res=$result->result->complete;
-
-        if($res == false){
-            $status = "Transaction has not signed";
+    $response =$result->result->complete;
+    if($response == false){
+            $signedtxHex = "Transaction has not signed";
         } else {
-            $status = $result->result->hex;
+            $signedtxHex = $result->result->hex;
         }
 
-    return $status;
+    return $signedtxHex;
     }
 
 
-function sendrawtransaction($signed_txhex) {
+function sendRawTransaction($signed_txhex) {
         
 $curl = curl_init();
 curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username. ":" . $this->pass,
     CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
@@ -132,31 +131,26 @@ curl_setopt_array($curl, array(
     CURLOPT_TIMEOUT => 30,
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => "{\"method\":\"sendrawtransaction\",\"params\":[\"$signed_txhex\"],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
+    CURLOPT_POSTFIELDS => "{\"method\":\"sendrawtransaction\",\"params\":[\"$signed_txhex\"],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
     CURLOPT_HTTPHEADER => array(
         "cache-control: no-cache",
         "content-type: application/json"
     )
 ));
-    error_log("Sending request: sendrawtransaction");
     $result   = json_decode(curl_exec($curl));
-
     $err      = curl_error($curl);
     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-
-         $txid= $result->result;
-
-          if($txid == null){
-              $print =  $result->error->message;
-          }
-          else {
-            $print = $txid;
+    $txid= $result->result;
+    if($txid == null){
+        $txid =  $result->error->message;
+    } else {
+        $txid = $txid;
         }
 
-    return $print;
+    return $txid;
     }
 
-function sendsignedtransaction($sender_address,$reciever_address,$private_key,$data,$amount) {
+function sendSignedTransaction($sender_address,$reciever_address,$private_key,$data,$amount) {
         $hex_data = bin2hex($data);
         
         $dumptxHex = $this->createrawtransaction($sender_address,$reciever_address,$hex_data,$amount);
@@ -168,13 +162,12 @@ function sendsignedtransaction($sender_address,$reciever_address,$private_key,$d
     return $txid;
 }
 
-function retrievetransaction($txid){
-      $curl = curl_init();
-    
+function retrieveTransaction($txid){
+    $curl = curl_init();
     curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username. ":" . $this->pass,
     CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
@@ -182,36 +175,33 @@ function retrievetransaction($txid){
     CURLOPT_TIMEOUT => 30,
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => "{\"method\":\"getrawtransaction\",\"params\":[\"$txid\",1],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
+    CURLOPT_POSTFIELDS => "{\"method\":\"getrawtransaction\",\"params\":[\"$txid\",1],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
     CURLOPT_HTTPHEADER => array(
         "cache-control: no-cache",
         "content-type: application/json"
     )
 ));
-    error_log("Sending request: getrawtransaction");
     $result   = json_decode(curl_exec($curl));
-
     $err      = curl_error($curl);
     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        $retrievehexdata = $result->result->data[0];
-        $sentdata  =hex2bin("$retrievehexdata");
-        $sentamount =  $result->result->vout[0]->value;
+    if($result->result==null){
+        $tx_info = $result->error->message;
+    } else {
+    $hexdata = $result->result->data[0];
+    $sentdata  =hex2bin($hexdata);
+    $sentamount =  $result->result->vout[0]->value;
+    $response = array("data" => $sentdata,"value" => $sentamount);
+    $tx_info = json_encode($response, JSON_PRETTY_PRINT);
+}
+    return $tx_info;
+}
 
-         $myJSON = array("data" => $retrievehexdata,"value" => $sentamount);
-        $json_string = json_encode($myJSON, JSON_PRETTY_PRINT);
-        
-    return $json_string;
-
-
-    }
-
-function getfee($txid,$address){
-      $curl = curl_init();
-    
+function getFee($txid,$address){
+    $curl = curl_init();
     curl_setopt_array($curl, array(
-    CURLOPT_PORT => $GLOBALS['port'],
-    CURLOPT_URL => $GLOBALS['url'],
-    CURLOPT_USERPWD => $GLOBALS['username'] . ":" . $GLOBALS['pass'],
+    CURLOPT_PORT => $this->port,
+    CURLOPT_URL => $this->url,
+    CURLOPT_USERPWD => $this->username. ":" . $this->pass,
     CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
@@ -219,34 +209,26 @@ function getfee($txid,$address){
     CURLOPT_TIMEOUT => 30,
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => "{\"method\":\"getaddresstransaction\",\"params\":[\"$address\",\"$txid\",true],\"id\":1,\"chain_name\":\"" . $GLOBALS["chain"] . "\"}",
+    CURLOPT_POSTFIELDS => "{\"method\":\"getaddresstransaction\",\"params\":[\"$address\",\"$txid\",true],\"id\":1,\"chain_name\":\"" . $this->chain . "\"}",
     CURLOPT_HTTPHEADER => array(
         "cache-control: no-cache",
         "content-type: application/json"
     )
 ));
-    error_log("Sending request: getaddresstransaction");
     $result   = json_decode(curl_exec($curl));
-
     $err      = curl_error($curl);
     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-
-        $sentamount = $result->result->vout[0]->amount;
-        $balanceamount =  $result->result->balance->amount;
-        $fees = (abs($balanceamount) - $sentamount);
-            
-        
-
-    return $fees;
-
-
+    if($result->result==null){
+        $fee = $result->error->message;
+    } else {
+    $sentamount = $result->result->vout[0]->amount;
+    $balanceamount =  $result->result->balance->amount;
+    $fee = (abs($balanceamount) - $sentamount);
+  }
+    return $fee;
 }
 
 }
-
-// $testObject2 = new Transaction();
-// $res = $testObject2->sendsignedtransaction();
-// print_r($res);
 ?>
 
 
