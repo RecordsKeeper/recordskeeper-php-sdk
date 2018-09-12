@@ -16,18 +16,13 @@ $config = include('config.php');
 ```
 Import values from config file.
 
-- User name: The rpc user is used to call the APIs.
-- Password: The rpc password is used to authenticate the APIs.
-
+Import RecordsKeeper library.
 
 ```PHP
-   $chain = $config['chain'];
-   $url = $config['url'];
-   $username = $config['rkuser'];
-   $pass = $config['passwd'];
-   $port = $config['port'];
+  require_once "vendor/autoload.php";
+  use recordskeeper\recordskeepersdk\wallet;
 ```
-Now we have node authentication credentials.
+
 
 
   Wallet Class
@@ -45,8 +40,8 @@ createWallet() function is used to create wallet on RecordsKeeper blockchain
 ```PHP
   createWallet()  
 
-  $create = new wallet();
-  $result = $create->createwallet();                        #createwallet() function call
+  $classObject = new Wallet();
+  $result = $classObject->createWallet();                   #createwallet() function call
   echo($result->public_address);                            #prints public address of the wallet
   echo($result->private_key);                               #prints private key of the wallet
   echo($result->public_key);                                #prints public key of the wallet
@@ -66,9 +61,9 @@ getPrivateKey() function is used to retrieve private key of the given address.
 ```PHP
   getPrivateKey($public_address)  
 
-  $dumpkey = new wallet();
-  $result = $dumpkey->getPrivateKey($public_address);       #getPrivateKey() function call
-  echo($result);                                            #prints private key of the given address
+  $classObject = new Wallet();
+  $priv_key = $classObject->getPrivateKey($public_address);       #getPrivateKey() function call
+  echo($priv_key);                                                #prints private key of the given address
 ```   
 
 It will return private key of the given address.
@@ -81,8 +76,8 @@ retrieveWalletinfo() function is used to retrieve node wallet's information.
 ```PHP
   retrieveWalletinfo() 
 
-  $wallinfo = new wallet();
-  $result = $wallinfo->retrieveWalletinfo();               #retrieveWalletinfo() function call
+  $classObject = new Wallet();
+  $result = $classObject->retrieveWalletinfo();               #retrieveWalletinfo() function call
   echo($result->balance);                                  #prints wallet's balance
   echo($result->tx_count);                                 #prints wallet transaction count
   echo($result->unspent_tx);                               #prints unspent wallet transactions
@@ -103,8 +98,8 @@ backupWallet() function is used to create backup of the wallet.dat file.
 ```PHP
   backupWallet($filename) 
 
-  $backup = new wallet();
-  $result = $backup->backupWallet($filename);               #backupWallet() function call
+  $classObject = new Wallet();
+  $result = $classObject->backupWallet($filename);               #backupWallet() function call
   echo($result);                                            #prints result
 ```  
 
@@ -124,8 +119,8 @@ importWallet() function is used to import wallet's backup file.
 ```PHP
   importWallet($filename)
 
-  $import = new wallet();
-  $result = $import->importWallet($filename);               #backupWallet() function call
+  $classObject = new Wallet();
+  $result = $classObject->importWallet($filename);               #backupWallet() function call
   echo($result);                                            #prints result
 ```  
 It will return the response of the import wallet function. It will import the entire set of private keys which were dumped (using dumpwallet) into file filename. 
@@ -141,8 +136,8 @@ dumpWallet() function is used to retrieve transaction's information by passing t
 ```PHP
   dumpWallet($filename)
 
-  $Dwallet = new wallet();
-  $result = $Dwallet->dumpWallet($filename);                #dumpWallet() function call
+  $classObject = new Wallet();
+  $result = $classObject->dumpWallet($filename);                #dumpWallet() function call
   echo($result);                                            #print result 
 ```  
 It will return the response of the dump wallet function. Dumps the entire set of private keys in the wallet into a human-readable text format in file filename. Use with caution – any node with access to this file can perform any action restricted to this node’s addresses.
@@ -159,8 +154,8 @@ lockWallet() function is used to verify transaction's information by passing tra
 ```PHP
   lockWallet($password)
 
-  $lock = new wallet();
-  $result = $lock->lockWallet($password);                 #lockWallet() function call
+  $classObject = new Wallet();
+  $result = $classObject->lockWallet($password);                 #lockWallet() function call
   echo($result);                                          #print result
 ```  
 
@@ -179,8 +174,8 @@ unlockWallet() function is used to verify transaction's information by passing t
 ```PHP
   unlockWallet($password,$unlock_time)
 
-  $unlock = new wallet();
-  $result = $unlock->unlockWallet($password,$unlock_time);  #unlockWallet() function call
+  $classObject = new Wallet();
+  $result = $classObject->unlockWallet($password,$unlock_time);  #unlockWallet() function call
   echo($result);                                            #print result
 ```  
 It will return the response of the unlock wallet function. This uses passphrase to unlock the node’s wallet for signing transactions for the next timeout seconds. This will also need to be called before the node can connect to other nodes or sign blocks that it has mined.
@@ -198,8 +193,8 @@ changeWalletPassword() function is used to change wallet's password and set new 
 ```PHP
    changeWalletPassword($old_password,$new_password)
 
-   $change = new wallet();
-   $result = $change->changeWalletPassword($old_password,$new_password); #changeWalletPassword() function call
+   $classObject = new Wallet();
+   $result = $classObject->changeWalletPassword($old_password,$new_password); #changeWalletPassword() function call
    echo($result);                                                        #print result
 ```  
 
@@ -218,8 +213,8 @@ signMessage() function is used to change wallet's password and set new password.
 ```PHP
    signMessage($private_key,$message)
 
-   $sign = new wallet();
-   $result = $sign->signMessage($private_key,$message);      #signMessage() function call
+   $classObject = new Wallet();
+   $result = $classObject->signMessage($private_key,$message);      #signMessage() function call
    echo($result);                                            #print signed message
 ```  
 It will return the signed message.
@@ -237,8 +232,8 @@ verifyMessage() function is used to change wallet's password and set new passwor
 ```PHP
    verifyMessage($address,$signedMessage,$message)
       
-   $verify = new wallet();
-   $result = $verify->verifyMessage($address,$signedMessage,$message);    #verifyMessage() function call
+   $classObject = new Wallet();
+   $result = $classObject->verifyMessage($address,$signedMessage,$message);    #verifyMessage() function call
    echo($result);                                                         #print validity of the message
 ```
 It will return the validity of the message.

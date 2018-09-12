@@ -17,18 +17,13 @@ $config = include('config.php');
 ```
 Import values from config file.
 
-- User name: The rpc user is used to call the APIs.
-- Password: The rpc password is used to authenticate the APIs.
-
+Import RecordsKeeper library.
 
 ```PHP
-   $chain = $config['chain'];
-   $url = $config['url'];
-   $username = $config['rkuser'];
-   $pass = $config['passwd'];
-   $port = $config['port'];
+  require_once "vendor/autoload.php";
+  use recordskeeper\recordskeepersdk\blockchain;
 ```
-Now we have node authentication credentials.
+
 
 
 Blockchain class
@@ -44,10 +39,10 @@ Blockchain class
 getChainInfo() function is used to retrieve Blockchain parameters.
 
 ```PHP
-  getchaininfo()
+  getChainInfo()
 
-  $info = new blockchain();
-  $result = $info->chaininfo();                                          #chaininfo() function call
+  $classObject = new Blockchain();
+  $result = $classObject->chaininfo();                                          #getChainInfo() function call
   echo($result->chain-protocol);                                         #prints blockchain's protocol
   echo($result->chain-description);                                      #prints blockchain's description
   echo($result->root-stream-name);                                       #prints blockchain's root stream
@@ -67,10 +62,10 @@ getNodeInfo() function is used to retrieve node's information on RecordsKeeper B
 
 
 ```PHP
-  getnodeinfo() 
+  getNodeInfo() 
 
-  $node = new blockchain();
-  $result = $ret->getnodeinfo();                                          #getnodeinfo() function call
+  $classObject = new Blockchain();
+  $result = $classObject->getNodeInfo();                                          #getNodeInfo() function call
   echo($result->node-balance);                                            #prints balance of the node
   echo($result->synced-blocks);                                           #prints no of synced blocks
   echo($result->node-address);                                            #prints node's address
@@ -87,9 +82,9 @@ permissions() function is used to retrieve node's permissions.
 ```PHP
   permissions()  
 
-  $perm = new blockchain();
-  $allowed_perm = $perm->permissions();                                  #permissions() function call
-  echo($allowed_perm);                                                   #prints permissions available to the node
+  $classObject = new Blockchain();
+  $allowed_permissions = $classObject->permissions();                                  #permissions() function call
+  echo($allowed_permissions);                                                   #prints permissions available to the node
 ```
 It will return the permissions available to the node.
 
@@ -98,10 +93,10 @@ It will return the permissions available to the node.
 getpendingTransactions() function is used to retrieve pending transaction's information like no of pending transactions and the pending transactions. 
 
 ```PHP
-  getpendingTransactions($address)  
+  getPendingTransactions($address)  
 
-  $trans = new blockchain();
-  $result = $trans->getpendingTransactions($address);                   #getpendingTransactions() function call
+  $classObject = new Blockchain();
+  $result = $classObject->getPendingTransactions($address);             #getPendingTransactions() function call
   echo($result->tx);                                                    #prints pending transactions
   echo($result->tx_count);                                              #prints pending transaction count
 ```
@@ -115,9 +110,9 @@ checkNodeBalance() function is used to check the total balance of the node.
 ```PHP
   checkNodeBalance() 
 
-  $bal = new blockchain();
-  $result = $bal->checkNodeBalance();                                    #checkNodeBalance() function call
-  echo($result);                                                         #prints total balance of the node
+  $classObject = new Blockchain();
+  $node_balance = $classObject->checkNodeBalance();                      #checkNodeBalance() function call
+  echo($node_balance);                                                   #prints total balance of the node
 ```  
 
 It will return the total balance of the node on RecordsKeeper Blockchain.

@@ -18,17 +18,12 @@ $config = include('config.php');
 ```
 Import values from config file.
 
-- User name: The rpc user is used to call the APIs.
-- Password: The rpc password is used to authenticate the APIs.
+Import RecordsKeeper library.
 
 ```PHP
-   $chain = $config['chain'];
-   $url = $config['url'];
-   $username = $config['rkuser'];
-   $pass = $config['passwd'];
-   $port = $config['port'];
+  require_once "vendor/autoload.php";
+  use recordskeeper\recordskeepersdk\address;
 ```
-Now we have node authentication credentials.
 
 
 Assets Class
@@ -46,9 +41,9 @@ createAsset() function is used to create or issue an asset.
 ```PHP
   createAsset($address,$asset_name,$asset_qty)
 
-  $create = new assets();
-  $result = $create->createAsset($address,$asset_name,$asset_qty);       #createAsset() function call
-  echo($result);                                                         #print transaction id of the issued asset
+  $classObject = new Assets();
+  $txid = $classObject->createAsset($address,$asset_name,$asset_qty);       #createAsset() function call
+  echo($txid);                                                         #print transaction id of the issued asset
 ```
 It will return the transaction id of the issued asset.
 
@@ -68,9 +63,9 @@ sendAsset() function is used to send an asset.
 ```PHP
   sendAsset($address,$assetname,$qty)  
 
-  $txid = new assets();
-  $result = $txid->sendAsset($address,$assetname,$qty);                #sendAsset() function call
-  echo($result);                                                       #print a transaction id of the sent asset
+  $classObject = new Assets();
+  $txid = $classObject->sendAsset($address,$assetname,$qty);                #sendAsset() function call
+  echo($txid);                                                       #print a transaction id of the sent asset
 ```
 It will return the transaction id of the sent asset.
 
@@ -82,8 +77,8 @@ retrieveAssets() function is used to list all assets, no of assets, issued quant
 ```PHP
   retrieveAssets() 
 
-  $ret = new assets();
-  $result = $ret->retrieveAssets();                                   #retrieveAssets() function call
+  $classObject = new Assets();
+  $result = $classObject->retrieveAssets();                                   #retrieveAssets() function call
   echo($result->name);                                                #print  name of all the assets
   echo($result->asset_count);                                         #prints total asset count
   echo($result->id);                                                  #prints assets issued transaction id

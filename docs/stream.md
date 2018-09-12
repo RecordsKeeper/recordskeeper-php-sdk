@@ -14,22 +14,17 @@ Node Authentication
 Import config file.
 
 ```PHP
-$config = include('config.php')
+$config = include('config.php');
 ```
 Import values from config file.
 
-- User name: The rpc user is used to call the APIs.
-- Password: The rpc password is used to authenticate the APIs.
-
+Import RecordsKeeper library.
 
 ```PHP
-   $chain = $config['chain'];
-   $url = $config['url'];
-   $username = $config['rkuser'];
-   $pass = $config['passwd'];
-   $port = $config['port'];
+  require_once "vendor/autoload.php";
+  use recordskeeper\recordskeepersdk\stream;
 ```
-Now we have node authentication credentials.
+
 
 
 Stream Class
@@ -45,19 +40,17 @@ Stream Class
  
 You have to pass these four arguments to the publish function call:
 
-- Data Hex of the data to be published
+- Data to be published
 - Address of the publihser
 - Stream to which you want your data to be published
 - key Value for the data to be published
 
-The **data.hex()** will convert the data into a hex value
-
 ```PHP
   publish($address,$stream,$key,$data)   
 
-  $pub = new stream();
-  $result = $pub->publish($address,$stream,$key,$data);              #publish() function call
-  echo($result);                                                     #prints the transaction id of the data published
+  $classObject = new Stream();
+  $txid = $classObject->publish($address,$stream,$key,$data);      #publish() function call
+  echo($txid);                                                     #prints the transaction id of the data published
 ```
 It will return the transaction id of the published data, use this information to retrieve the particular data from the stream.
 
@@ -71,12 +64,12 @@ You have to pass these two arguments to the retrieve function call:
 
 
 ```PHP 
-  retrieve($stream,$txid) 
+  retrieveData($stream,$txid) 
 
-  $ret = new stream();    
-  $result = $ret->retrieve($stream,$txid);                           #call retrieve function with stream and txid as the required parameter
+  $classObject = new Stream();    
+  $data = $classObject->retrieve($stream,$txid);   #retrieveData function call with stream and txid as the required parameter
   
-  echo($result);                                                     #prints info of the transaction                                            
+  echo($data);                                          #prints data published in the transaction                                            
 ```
 It will return the item's details like publisher address, key value, confirmations, hexdata and transaction id.
 
@@ -93,8 +86,8 @@ You have to pass these three arguments to the retrieveWithAddress function call:
 ```PHP
   retrieveWithAddress($stream,$address,$count)
 
-  $ret = new stream();
-  $result = $ret->retrieveWithAddress($stream,$address,$count);   #retrieveWithAddress() function call
+  $classObject = new Stream();
+  $result = $classObject->retrieveWithAddress($stream,$address,$count);   #retrieveWithAddress() function call
   echo($result->key);                                             #prints key value of the data
   echo($result->txid);                                            #prints transaction id of the data
   echo($result->data);                                            #prints raw data 
@@ -114,8 +107,8 @@ You have to pass these three arguments to the retrieveWithKey function call:
 ```PHP 
   retrieveWithKey($stream,$key,$count)
 
-  $ret = new stream();    
-  $result = $ret->retrieveWithKey($stream,$key,$count);          #call retrieveWithKey function with stream,key and count as the required parameter
+  $classObject = new Stream();    
+  $result = $classObject->retrieveWithKey($stream,$key,$count);          #call retrieveWithKey function with stream,key and count as the required parameter
   
   echo($result->publisher);                                      #prints publisher's address of the published data
   echo($result->txid);                                           #prints transaction id of the data
@@ -137,8 +130,8 @@ You have to pass these three arguments to the retrieveWithKey function call:
 ```PHP 
   verifyData($stream,$data,$count)
 
-  $verify = new stream();    
-  $result = $verify->verifyData($stream,$data,$count);          #call verifyData function with stream,data and count as the required parameter
+  $classObject = new Stream();    
+  $result = $classObject->verifyData($stream,$data,$count);    #call verifyData function with stream,data and count as the required parameter
   
   echo($result);                                                #prints if verification is successful or not
 ```  
@@ -156,8 +149,8 @@ You have to pass these two arguments to the verifyWithKey function call:
 ```PHP 
    retrieveItems($stream,$count)
 
-  $retitems = new stream();    
-  $result = $retitems->retrieveItems($stream,$count);          #call retrieveItems function with stream and count as the required parameter
+  $classObject = new Stream();    
+  $result = $classObject->retrieveItems($stream,$count);          #call retrieveItems function with stream and count as the required parameter
   
   echo($result->address);                                      #prints address of the publisher of the item
   echo($result->key);                                          #prints key value of the stream item

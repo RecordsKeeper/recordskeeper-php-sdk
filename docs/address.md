@@ -21,18 +21,12 @@ $config = include('config.php');
 ```
 Import values from config file.
 
-- User name: The rpc user is used to call the APIs.
-- Password: The rpc password is used to authenticate the APIs.
-
+Import RecordsKeeper library.
 
 ```PHP
-   $chain = $config['chain'];
-   $url = $config['url'];
-   $username = $config['rkuser'];
-   $pass = $config['passwd'];
-   $port = $config['port'];
+  require_once "vendor/autoload.php";
+  use recordskeeper\recordskeepersdk\address;
 ```
- Now we have node authentication credentials.
 
 
 Address Class
@@ -51,9 +45,9 @@ getAddress() function is used to generate a new wallet address.
 ```PHP
   getAddress()
 
-  $newaddress = new address();
-  $result = $newaddress->getAddress();                        #getAddress function call
-  echo($result);                                              #print a new address
+  $classObject = new Address();
+  $address = $classObject->getAddress();                        #getAddress function call
+  echo($address);                                               #print a new address
 ```
 It will return a new address of the wallet.
 
@@ -70,9 +64,9 @@ getMultisigAddress() function is used to generate a new multisignature address.
 ```PHP
   getMultisigAddress($nrequired,$key)  
 
-  $newaddress = new address();
-  $result = $newaddress->getMultisigAddress($nrequired,$key);   #getMultisigAddress() function call
-  echo($result);                                                #print a newAddress
+  $classObject = new Address();
+  $MultisigAddress = $newaddress->getMultisigAddress($nrequired,$key);   #getMultisigAddress() function call
+  echo($MultisigAddress);                                                #print a newMultisigAddress
 ```
 It will return a new multisignature address on RecordsKeeper Blockchain.
 
@@ -89,9 +83,9 @@ getMultisigWalletAddress() function is used to generate a new wallet address.
 ```PHP
   getMultisigWalletAddress($nrequired,$key)  
 
-  $newaddress = new address();
-  $result = $newaddress->getMultisigWalletAddress($nrequired,$key);   #getMultisigWalletAddress() function call
-  echo($result);                                                      #print a newAddress
+  $classObject = new Address();
+  $MultisigWalletAddress = $classObject->getMultisigWalletAddress($nrequired,$key);   #getMultisigWalletAddress() function call
+  echo($MultisigWalletAddress);                                                      #print a newAddress
 ```
 It will return a new multisignature address on the wallet.
 
@@ -103,10 +97,10 @@ retrieveAddresses() function is used to list all addresses and no of addresses o
 ```PHP
   retrieveAddresses()
 
-  $newaddress = new address();
-  $result = $newaddress->retrieveAddresses();                 #retrieveAddresses function call
-  echo($result->address);                                     #print all the addresses of the wallet
-  echo($result->address_count);                               #print the address count
+  $classObject = new Address();
+  $addresses = $classObject->retrieveAddresses();                 #retrieveAddresses function call
+  echo($addresses->address);                                     #print all the addresses of the wallet
+  echo($addresses->address_count);                               #print the address count
 ```
 It will return all the addresses and the count of the addresses on the wallet.
  
@@ -119,10 +113,10 @@ You have to pass address as argument to the checkifValid function call:
 checkifValid() function is used to check validity of a particular address. 
 
 ```PHP
-  checkifValid()
+  checkIfValid()
 
-  $newaddress = new address();
-  $result = $newaddress->checkifValid();                     #checkifValid() function call
+  $classObject = new Address();
+  $result = $classObject->checkIfValid();                     #checkIfValid() function call
   echo($result);                                             #print validity of the address
 ```  
 It will return if an address is valid or not.
@@ -136,11 +130,11 @@ You have to pass address as argument to the checkifMineAllowed function call:
 checkifMineAllowed() function is used to sign raw transaction by passing transaction hex of the raw transaction and the private key to sign the raw transaction.
 
 ```PHP
-  checkifMineAllowed($address) 
+  checkIfMineAllowed($address) 
 
-  $permissioncheck = new address();
-  $result = $permissioncheck->checkifMineAllowed($address);  #checkifValid() function call
-  echo($result);                                             #prints permission status of the given address
+  $classObject = new Address();
+  $result = $classObject->checkIfMineAllowed($address);  #checkIfMineAllowed() function call
+  echo($result);                                         #prints permission status of the given address
 ```
 It will return if mining permission is allowed or not.
 
@@ -155,9 +149,9 @@ checkBalance() function is used to check the balance of the address.
 ```PHP
   checkBalance($address)
  
-  $address_balance = new address();
-  $result = $address_balance->checkBalance($address);        #checkBalance() function call
-  echo($result);                                             #prints balance of the address 
+  $classObject = new Address();
+  $balance = $classObject->checkBalance($address);        #checkBalance() function call
+  echo($balance);                                         #prints balance of the address 
 ```
 It will return the balance of the address on RecordsKeeper Blockchain.
 
@@ -173,9 +167,9 @@ importAddress() function is used to check the balance of the address.
 ```PHP
   importAddress($public_address)
   
-  $response = new address();
-  $result = $response->$importAddress($public_address);      #importAddress() function call
-  echo($result);                                             #prints response whether address is successfully imported or not
+  $classObject = new Address();
+  $result = $classObject->$importAddress($public_address);      #importAddress() function call
+  echo($result);                                                #prints response whether address is successfully imported or not
 ```
 It will return the response of the importAddress() function call.
 

@@ -18,18 +18,13 @@ $config = include('config.php');
 ```
 Import values from config file.
 
-- User name: The rpc user is used to call the APIs.
-- Password: The rpc password is used to authenticate the APIs.
-
+Import RecordsKeeper library.
 
 ```PHP
-   $chain = $config['chain'];
-   $url = $config['url'];
-   $username = $config['rkuser'];
-   $pass = $config['passwd'];
-   $port = $config['port'];
+  require_once "vendor/autoload.php";
+  use recordskeeper\recordskeepersdk\permissions;
 ```
-Now we have node authentication credentials.
+
 
 
 Permissions Class
@@ -52,11 +47,11 @@ Permissions Class
 grantPermission() function is used to grant permissions like connect, send, receive, create, issue, mine, activate, admin to an address on RecordsKeeper Blockchain.
 
 ```PHP
-  grantPermission($address,$permissions)  
+  grantPermissions($address,$permissions)  
 
-  $grant = new Permissions();
-  $result = $grant->grantPermission($address,$permissions);          #grantPermission() function call
-  echo($result);                                                     #prints response of the grant permision transaction
+  $classObject = new Permissions();
+  $txid = $classObject->grantPermission($address,$permissions);    #grantPermissions() function call
+  echo($txid);                                                    #prints txid of the grant permision transaction
 ```
 It will return the transaction id of the permission transaction.
 
@@ -76,9 +71,9 @@ revokePermission() function is used to revoke permissions like connect, send, re
 ```PHP
   revokePermission($address,$permissions)  
 
-  $revoke = new Permissions();
-  $result = $revoke->revokePermission($address,$permissions);      #revokePermission() function call
-  echo($result);                                                   #prints response of the revoke permision transaction
+  $classObject = new Permissions();
+  $txid = $classObject->revokePermission($address,$permissions); #revokePermission() function call
+  echo($txid);                                                   #prints txid of the revoke permision transaction
 ```  
 It will return the transaction id of the permission transaction.
 

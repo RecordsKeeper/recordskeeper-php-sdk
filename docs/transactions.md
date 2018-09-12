@@ -16,18 +16,13 @@ $config = include('config.php');
 ```
 Import values from config file.
 
-- User name: The rpc user is used to call the APIs.
-- Password: The rpc password is used to authenticate the APIs.
-
+Import RecordsKeeper library.
 
 ```PHP
-   $chain = $config['chain'];
-   $url = $config['url'];
-   $username = $config['rkuser'];
-   $pass = $config['passwd'];
-   $port = $config['port'];
+  require_once "vendor/autoload.php";
+  use recordskeeper\recordskeepersdk\transactions;
 ```
-Now we have node authentication credentials.
+
 
 
 Transaction Class
@@ -53,9 +48,9 @@ sendTransaction() function is used to send transaction by passing reciever's add
   sendTransaction($sender_address,$reciever_address,$data,$amount)  
 
 
-  $send = new Transaction();
-  $result = $send->sendTransaction($sender_address,$reciever_address,$data,$amount);   #sendTransaction() function call
-  echo($result);                                                    #prints transaction id of the sent transaction
+  $classObject = new Transaction();
+  $txid = $classObject ->sendTransaction($sender_address,$reciever_address,$data,$amount);   #sendTransaction() function call
+  echo($txid);                                                    #prints transaction id of the sent transaction
 ```
 
 It will return the transaction id of the raw transaction.
@@ -76,10 +71,10 @@ sendSignedTransaction() function is used to send transaction by passing reciever
 ```PHP 
   sendSignedTransaction($sender_address,$reciever_address,$amount,$private_key,$data)  
 
-  $sendsigned = new Transaction();    
-  $result = $sendsigned->sendSignedTransaction($sender_address,$reciever_address,$amount,$private_key,$data); #sendSignedTransaction function call
+  $classObject  = new Transaction();    
+  $txid = $classObject->sendSignedTransaction($sender_address,$reciever_address,$amount,$private_key,$data); #sendSignedTransaction function call
   
-  echo($result);                                                 #prints transaction id of the signed transaction                           
+  echo($txid);                           #prints transaction id of the signed transaction                           
 ```
 It will return transaction id of the signed transaction.
 
@@ -99,9 +94,9 @@ createRawTransaction() function is used to create raw transaction by passing rec
 ```PHP
    createRawTransaction($sender_address,$reciever_address,$amount,$data)  
 
-   $tx_hex = new Transaction();
-   $result = $tx_hex->createRawTransaction($sender_address,$reciever_address,$amount,$data);   #createRawTransaction() function call
-   echo($result);                                               #prints transaction hex of the raw transaction.
+   $classObject = new Transaction();
+   $txHex = $classObject->createRawTransaction($sender_address,$reciever_address,$amount,$data);   #createRawTransaction() function call
+   echo($txHex);                                               #prints transaction hex of the raw transaction.
 ``` 
 It will return transaction hex of the raw transaction.
 
@@ -119,9 +114,9 @@ signRawTransaction() function is used to sign raw transaction by passing transac
 ```PHP 
    signRawTransaction($tx_hex,$private_key) 
 
-   $sign = new Transaction();    
-   $result = $sign->signRawTransaction($tx_hex,$private_key);  #signRawTransaction function call
-   echo($result);                                              #prints signed transaction hex of the raw transaction
+   $classObject = new Transaction();    
+   $signedTxHex = $classObject->signRawTransaction($tx_hex,$private_key);  #signRawTransaction function call
+   echo($signedTxHex);                                         #prints signed transaction hex of the raw transaction
 ``` 
 It will return signed transaction hex of the raw transaction.
 
@@ -138,10 +133,10 @@ sendRawTransaction() function is used to send raw transaction by passing signed 
 ```PHP 
   sendRawTransaction($signed_txHex) 
 
-  $sendraw = new Transaction();    
-  $result = $sendraw-> sendRawTransaction($signed_txHex);      #sendRawTransaction() function call
+  $classObject = new Transaction();    
+  $txid = $classObject->sendRawTransaction($signed_txHex);      #sendRawTransaction() function call
   
-  echo($result);                                              #prints transaction id of the raw transaction
+  echo($txid);                                              #prints transaction id of the raw transaction
 ```
   
 It will return transaction id of the raw transaction sent on to the Blockchain.
@@ -160,8 +155,8 @@ retrieveTransaction() function is used to retrieve transaction's information by 
 ```PHP 
    retrieveTransaction($tx_id)
 
-   $ret = new Transaction();    
-   $result = $ret->retrieveTransaction($tx_id);                #retrieveTransaction() function call
+   $classObject = new Transaction();    
+   $result = $classObject->retrieveTransaction($tx_id);        #retrieveTransaction() function call
    echo($result->sent_data);                                   #print sent data
    echo($result->sent_amount);                                 #print sent amount
 ```   
@@ -182,9 +177,9 @@ getFee() function is used to calculate transaction's fee by passing transaction 
 ```PHP 
    getFee($address,$tx_id)
 
-   $fee = new Transaction();    
-   $result = $fee->getfee($address,$tx_id);                   #getfee() function call
-   echo($result);                                             #prints fees consumed in the verified transaction
+   $classObject = new Transaction();    
+   $fee = $classObject->getfee($address,$tx_id);                   #getFee() function call
+   echo($fee);                                             #prints fees consumed in the verified transaction
 ```  
    
 It will return the fees consumed in the transaction.

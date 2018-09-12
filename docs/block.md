@@ -16,18 +16,13 @@ $config = include('config.php');
 ```
 Import values from config file.
 
-- User name: The rpc user is used to call the APIs.
-- Password: The rpc password is used to authenticate the APIs.
-
+Import RecordsKeeper library.
 
 ```PHP
-   $chain = $config['chain'];
-   $url = $config['url'];
-   $username = $config['rkuser'];
-   $pass = $config['passwd'];
-   $port = $config['port'];
+  require_once "vendor/autoload.php";
+  use recordskeeper\recordskeepersdk\block;
 ```
-Now we have node authentication credentials.
+
 
 
 Block Class
@@ -46,10 +41,10 @@ You have to pass these block height as the argument to the blockinfo function ca
 
 
 ```PHP
-  blockinfo($block_height)
+  blockInfo($block_height)
 
-  $info = new block();
-  $result = $info->blockinfo($block_height);              #blockinfo() function call
+  $classObject = new Block();
+  $result = $classObject->blockInfo($block_height);              #blockInfo() function call
   echo($result->txcount);                                 #prints transaction count of the block
   echo($result->tx);                                      #prints transaction id of the block
   echo($result->size);                                    #prints size of the block
@@ -75,12 +70,12 @@ You have to pass these three arguments to the createAsset function call:
 ```PHP
   retrieveBlocks($block_range) 
 
-  $ret = new block();
-  $result = $ret->retrieveBlocks($block_range);           #retrieveBlocks() function call
+  $classObject = new Block();
+  $result = $classObject->retrieveBlocks($block_range);           #retrieveBlocks() function call
   echo($result->blockhash);                               #print hash of the blocks
   echo($result->miner);                                   #prints miner of the blocks
   echo($result->blocktime);                               #prints block time of the blocks
-  echo($result->txcount);                                 #prints transaction count of the blocks
+  echo($result->total-txcount);                                 #prints transaction count of the blocks
 ```
 
 It will return blockhash, miner address, blocktime and transaction count of the blocks.
